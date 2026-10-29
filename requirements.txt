@@ -1,0 +1,12 @@
+# Pinned versions from the verified Phase 2 Python 3.11 environment
+qiskit==2.6.1
+qiskit-aer==0.18.2
+numpy==2.4.6
+scipy==1.17.1
+pandas==3.1.0
+matplotlib==3.11.2
+networkx==3.6.1
+jupyterlab==4.6.4
+ipykernel==7.4.0
+nbconvert==7.17.2
+pylatexenc==2.11

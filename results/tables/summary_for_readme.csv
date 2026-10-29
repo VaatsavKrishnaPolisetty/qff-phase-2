@@ -1,0 +1,5 @@
+processor,condition,p_feasible,p_opt,best_feasible_value,best_feasible_weight,pct_optimal,cx,depth,swaps
+B,ideal,0.9587,0.021,26.0,14.0,100.0,121.0,117.0,17.0
+B,noisy,0.9434,0.0249,26.0,14.0,100.0,121.0,117.0,17.0
+D,ideal,0.9634,0.0225,26.0,14.0,100.0,102.0,87.0,10.0
+D,noisy,0.9421,0.0225,26.0,14.0,100.0,102.0,87.0,10.0

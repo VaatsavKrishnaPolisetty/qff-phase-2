@@ -1,0 +1,7 @@
+processor,condition,executable,note,shots,p_feasible,p_opt,best_feasible_value,best_feasible_weight,best_feasible_items,pct_optimal,most_sampled_feasible_items,most_sampled_feasible_value,mean_qubo_cost,logical_qubits,physical_qubits,logical_cx,cx,cx_overhead,depth,two_q_depth,swaps
+A,ideal,False,"not executable: needs 9 qubits, has 5",,,,,,,,,,,,,,,,,,
+A,noisy,False,"not executable: needs 9 qubits, has 5",,,,,,,,,,,,,,,,,,
+B,ideal,True,,4096,0.958740234375,0.02099609375,26,14,"[1, 2, 3, 4]",100.0,"[1, 3]",17,48.946533203125,9,9,72,121,49,117,79,17
+B,noisy,True,,4096,0.943359375,0.02490234375,26,14,"[1, 2, 3, 4]",100.0,"[2, 4, 5]",17,82.846435546875,9,9,72,121,49,117,79,17
+D,ideal,True,,4096,0.96337890625,0.0224609375,26,14,"[1, 2, 3, 4]",100.0,"[1, 3]",17,48.865234375,9,9,72,102,30,87,59,10
+D,noisy,True,,4096,0.942138671875,0.0224609375,26,14,"[1, 2, 3, 4]",100.0,"[1, 3]",17,74.956298828125,9,9,72,102,30,87,59,10
