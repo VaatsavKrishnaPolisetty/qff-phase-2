@@ -31,7 +31,7 @@
     "p2": 0.005,
     "p_readout": 0.01
   },
-  "team": "YOUR_TEAM_NAME",
+  "team": "Emerging Genius",
   "problem_statement": "PS-O3",
   "note": "Fixed reference processor from the QFF 2026 kit, Section 3."
 }

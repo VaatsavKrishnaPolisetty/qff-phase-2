@@ -2,7 +2,7 @@
 ## Quantum Optimization Track — Problem Statement PS-O3
 ### Resource-Constrained Item Selection (0/1 Knapsack Problem) with QAOA
 
-**Team Name:** YOUR_TEAM_NAME  
+**Team Name:** Emerging Genius  
 **Problem Statement:** PS-O3 (Locked Official Instance)  
 **Date:** October 2026  
 
@@ -239,6 +239,9 @@ Five pseudorandom starting angles were drawn according to the official protocol 
    *Method:* Replace the 4 binary slack qubits with an unbalanced linear-quadratic penalty function applied directly to the 5 item variables:
    $$P_{\text{unbalanced}}(x) = \alpha \max\left(0, \sum w_i x_i - W\right)^2$$
    *Evidence:* Eliminating the 4 slack qubits reduces the problem from 9 qubits to 5 qubits and drops $ZZ$ interactions from 36 to 10. This reduces circuit depth by $>60\%$ and allows the problem to execute on compact 5-qubit processors like Processor A.
+
+![Unbalanced vs Slack Comparison](results/figures/unbalanced_vs_slack.png)
+
 2. **Multi-Angle QAOA (ma-QAOA) and $p \ge 2$ Layering:**
    *Method:* Assign distinct variational parameters $\gamma_{ij}$ to each Hamiltonian edge and $\beta_i$ to each qubit, or increase depth to $p=2$.
    *Evidence:* The classical seed sweep proved that global $(\gamma, \beta)$ parameters cannot selectively amplify the optimal subset $[1, 2, 3, 4]$ over safe interior subsets like $[1, 3]$. Multi-angle QAOA provides the necessary degrees of freedom to bias amplitudes toward the capacity boundary.

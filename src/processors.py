@@ -102,7 +102,7 @@ def candidate_graphs(min_q: int = 9, max_q: int = 12, n_random: int = 6) -> dict
     return cands
 
 
-def make_processor_d(num_qubits, edges, team="YOUR_TEAM_NAME", rationale="") -> dict:
+def make_processor_d(num_qubits, edges, team="Emerging Genius", rationale="") -> dict:
     return dict(name="Processor D", team=team, problem_statement="PS-O3",
                 num_qubits=int(num_qubits), edges=[list(map(int, e)) for e in edges],
                 basis_gates=list(BASIS_GATES), noise=dict(OFFICIAL_NOISE),

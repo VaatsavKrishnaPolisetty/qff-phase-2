@@ -1,6 +1,6 @@
 # QFF 2026 — Quantum Optimization — PS-O3: Resource-Constrained Item Selection (0/1 Knapsack)
 
-**Team:** YOUR_TEAM_NAME  |  **Problem statement:** PS-O3 (only this one)  |  **Repo frozen at:** final commit before 5:40 PM IST, Day 2
+**Team:** Emerging Genius  |  **Problem statement:** PS-O3 (only this one)  |  **Repo frozen at:** final commit before 5:40 PM IST, Day 2
 
 ## How to run (judges: follow exactly)
 ```bash
@@ -41,4 +41,4 @@ noise: 1q depolarizing 0.001 (rz,sx,x), 2q depolarizing 0.005 (cx), readout flip
 _List anything extra here, e.g. penalty sweep, unbalanced penalization, p = 2._
 
 ## AI tools used
-_State which tools and for what (e.g. "Claude for the project scaffold and formulation code; Antigravity for debugging and report drafting"). We verified all numbers ourselves._
+Antigravity (Google DeepMind) was used for test automation, code verification, benchmark script authoring, and report drafting. All numerical results, QUBO formulations, and circuits were independently audited and verified against the official challenge kit.
