@@ -113,3 +113,37 @@ def sample(qc: QuantumCircuit, proc: dict, noisy: bool, shots: int = SHOTS):
     tqc = transpile_official(qc, proc)
     counts = run_counts(tqc, proc["noise"] if noisy else None, shots)
     return counts, tqc
+
+
+# ----------------------------------------------------------------- Constraint-Preserving Mixer circuit
+def build_qaoa_cp_circuit(gamma, beta, h, J, scale, equal_pairs,
+                           n=K.N_QUBITS, measure=True):
+    """QAOA p=1 with a constraint-preserving XY mixer on equal-coefficient pairs.
+
+    Instead of the standard RX(2*beta) on every qubit, this applies RXX+RYY
+    on pairs of qubits whose constraint coefficients are equal.  Swapping
+    equal-coefficient qubits preserves the linear constraint c^T y = W exactly,
+    so the state stays in the feasible subspace.
+
+    The initial state is a uniform superposition over feasible states, set
+    via ``initialize`` (requires a statevector).  Use the helper in
+    qaoa_numpy._feasible_initial_state().
+    """
+    from .qaoa_numpy import _feasible_initial_state
+    import numpy as np
+    psi0 = _feasible_initial_state()
+    qc = QuantumCircuit(n, name="QAOA_CP_mixer")
+    qc.initialize(psi0, range(n))
+    # cost layer (same as standard QAOA)
+    for i in range(n):
+        if h[i] != 0:
+            qc.rz(2 * gamma * h[i] / scale, i)
+    for (i, j), v in J.items():
+        qc.rzz(2 * gamma * v / scale, i, j)
+    # constraint-preserving XY mixer
+    for i, j in equal_pairs:
+        qc.rxx(2 * beta, i, j)
+        qc.ryy(2 * beta, i, j)
+    if measure:
+        qc.measure_all()
+    return qc

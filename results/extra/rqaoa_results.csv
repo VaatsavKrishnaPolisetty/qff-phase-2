@@ -1,0 +1,2 @@
+method,items,value,weight,optimal,v_star
+RQAOA,"[1, 2, 3, 4]",26,14,True,26

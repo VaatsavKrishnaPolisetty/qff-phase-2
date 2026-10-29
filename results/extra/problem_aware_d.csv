@@ -1,0 +1,3 @@
+topology,cx,depth,swaps,p_feasible_noisy,p_opt_noisy
+"Frozen D (circulant C9(1,2))",102,87,10,0.9421,0.0225
+Problem-Aware D (co-designed),90,78,8,0.9451,0.0237

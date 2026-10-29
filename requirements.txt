@@ -10,3 +10,5 @@ jupyterlab==4.6.4
 ipykernel==7.4.0
 nbconvert==7.17.2
 pylatexenc==2.11
+pytest==9.2.0
+tabulate==0.10.0

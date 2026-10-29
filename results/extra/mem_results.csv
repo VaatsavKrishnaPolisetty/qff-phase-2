@@ -1,0 +1,5 @@
+processor,condition,p_feasible,p_opt,mean_qubo_cost
+B,noisy_raw,0.9434,0.0249,82.85
+B,noisy_mitigated,0.9434,0.025,80.6
+D,noisy_raw,0.9421,0.0225,74.96
+D,noisy_mitigated,0.9432,0.0219,72.31

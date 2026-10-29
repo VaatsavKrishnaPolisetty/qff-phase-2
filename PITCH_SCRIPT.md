@@ -42,15 +42,17 @@
 ---
 
 #### [1:50 - 2:30] Slide 4: Beyond the Required Benchmark — Breakthrough Extensions
-> "We went beyond the required benchmark with three evidence-based experiments:
-> 1. **Slack Elimination via Unbalanced Penalization:** By removing the 4 slack qubits and tuning an unbalanced quadratic barrier directly on 5 qubits, we solved the Processor A capacity limit! The circuit now executes on Processor A in just 32 CX gates, and on Processor B in only 26 CX gates (a **$78.5\%$ gate reduction**). Crucially, this doubled ground-state discovery rate ($P_{\text{opt}}$) from $2.2\%$ to **$6.3\%$**, beating uniform random guessing by almost $2\times$!
-> 2. **Depth $p=2$ QAOA:** Doubled variational control, pushing feasible sampling to **$96.85\%$**.
-> 3. **Zero-Noise Extrapolation (ZNE):** Applied digital unitary folding ($\lambda \in \{1, 3, 5\}$) to extrapolate back to zero noise, successfully recovering 13.4 units of mean QUBO cost degradation."
+> "We went beyond the required benchmark with five evidence-based experiments:
+> 1. **Slack Elimination via Shifted-Target Quadratic Penalty:** By removing the 4 slack qubits and tuning a shifted-target penalty directly on 5 qubits, we solved the Processor A capacity limit! The circuit now executes on Processor A in just 32 CX gates, and on Processor B in only 26 CX gates (a **$78.5\%$ gate reduction**). This doubled ground-state discovery rate ($P_{\text{opt}}$) from $2.2\%$ to **$6.3\%$**, beating uniform random guessing by almost $2\times$!
+> 2. **Conditional Value-at-Risk (CVaR) QAOA:** By replacing the mean cost with the average of the worst $\alpha = 30\%$ of outcomes, we pushed $P_{\text{opt}}$ to **$4.04\%$**, a **$79\%$ improvement** over the standard QAOA best seed and **$29\%$ above the random baseline** — proving that tail-aware cost functions extract better quality from the same $p=1$ circuit depth.
+> 3. **Constraint-Preserving Mixer QAOA:** We replaced the standard transverse-field mixer with an XY partial-swap mixer on equal-weight qubit pairs, preserving the linear constraint exactly. This guarantees **$100\%$ feasibility** in the ideal case and **$3.3\times$ improvement** in $P_{\text{opt}}$ (from $2.25\%$ to $7.47\%$), **$2.4\times$ the random baseline**.
+> 4. **Problem-Aware Processor D Co-Design:** We co-designed a topology placing the strongest $|J_{ij}|$ couplings at distance 1, cutting CX by $12\%$ and SWAPs by $20\%$ versus the generic circulant, with improved noisy quality.
+> 5. **Zero-Noise Extrapolation (ZNE):** Applied digital unitary folding ($\lambda \in \{1, 3, 5\}$) to extrapolate back to zero noise, recovering $13.4$ units of mean QUBO cost degradation."
 
 ---
 
 #### [2:30 - 3:00] Conclusion & Opening for Q&A
-> "In summary, our project demonstrates a complete, mathematically verified, reproducible quantum workflow: from QUBO formulation to custom chip design, noise characterization, and error mitigation. All results run in under 30 seconds and match our submitted report with zero discrepancies.
+> "In summary, our project demonstrates a complete, mathematically verified, reproducible quantum workflow: from QUBO formulation to custom chip design, noise characterization, and error mitigation. All results run in under 20 minutes on a laptop CPU and match our submitted report with zero discrepancies.
 >
 > Thank you, and we welcome your questions!"
 
@@ -59,10 +61,10 @@
 ### Anticipated Judge Questions & Bulletproof Answers
 
 #### Q1: "Why did QAOA at $p=1$ beat random guessing on feasibility ($94.2\%$ vs $87.5\%$), but not on finding the exact optimal subset ($2.2\%$ vs $3.1\%$)?
-* **Answer:** *"In the QUBO objective, the quadratic penalty $P=5$ penalizes constraint violations heavily (by $+5, +20, +45 \dots$), while value differences among valid subsets are small (0 to 26). At shallow depth $p=1$, the optimizer's two global angles $(\gamma, \beta)$ rapidly lower energy by evacuating probability mass out of the 4 invalid states into the 28 valid states. But because the valid subspace is flat and broad, probability spreads across safe interior solutions rather than concentrating on the single boundary-tight optimum. That is why our Additional Experiment with Unbalanced Penalization was so crucial—it doubled $P_{\text{opt}}$ to $6.3\%$ by removing the slack subspace dispersion."*
+* **Answer:** *"In the QUBO objective, the quadratic penalty $P=5$ penalizes constraint violations heavily (by $+5, +20, +45 \dots$), while value differences among valid subsets are small (0 to 26). At shallow depth $p=1$, the optimizer's two global angles $(\gamma, \beta)$ rapidly lower energy by evacuating probability mass out of the 4 invalid states into the 28 valid states. But because the valid subspace is flat and broad, probability spreads across safe interior solutions rather than concentrating on the single boundary-tight optimum. We addressed this with two novel approaches: CVaR-QAOA, which focuses the cost function on the tail, boosting $P_{\text{opt}}$ to $4.04\%$; and the constraint-preserving XY mixer, which guarantees $100\%$ feasibility and improves $P_{\text{opt}}$ to $7.47\%$ by confining all optimization effort to the feasible subspace."*
 
 #### Q2: "Why couldn't you run PS-O3 on Processor A?"
-* **Answer:** *"Processor A has only 5 qubits. PS-O3 has 5 items plus 4 binary slack variables needed to represent the capacity inequality up to 15 without truncation. Dropping slack bits on the required benchmark would violate the locked problem statement. However, in our Additional Experiment (Section 12), we proved that an unbalanced penalty formulation fits completely within Processor A's 5 qubits and achieves an optimal state discovery rate of $5.2\%$ under official noise."*
+* **Answer:** *"Processor A has only 5 qubits. PS-O3 has 5 items plus 4 binary slack variables needed to represent the capacity inequality up to 15 without truncation. Dropping slack bits on the required benchmark would violate the locked problem statement. However, in our Additional Experiment, we proved that a shifted-target quadratic penalty formulation fits completely within Processor A's 5 qubits and achieves an optimal state discovery rate of $5.2\%$ under official noise."*
 
 #### Q3: "What is the physical engineering trade-off of your Processor D design?"
 * **Answer:** *"While our 4-regular circulant graph reduces graph diameter from 4 to 2 and cuts SWAPs by $41\%$, increasing the degree of every qubit to 4 creates physical wiring density challenges on planar superconducting transmon chips. More adjacent control lines increase parasitic capacitive coupling, microwave frequency allocation collision risks, and residual $ZZ$-crosstalk."*

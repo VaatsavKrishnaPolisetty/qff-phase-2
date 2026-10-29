@@ -1,0 +1,5 @@
+mixer,condition,p_feasible,p_opt,cx
+Standard RX,ideal,0.9634,0.0225,102
+Standard RX,noisy,0.9421,0.0225,102
+Constraint-Preserving XY,ideal,1.0,0.0747,861
+Constraint-Preserving XY,noisy,0.9016,0.0286,861
