@@ -49,3 +49,4 @@ def test_multi_constraint_qubo_shape():
     assert info_dual["n_qubits"] == 13
     assert info_dual["n_weight_slack"] == 4
     assert info_dual["n_volume_slack"] == 4
+

@@ -151,8 +151,10 @@ def solve_case_study_brute_force(values, weights, volumes=None, max_weight=15, m
         "total_volume": best_volume,
     }
 
-def analyze_qubit_scaling(output_csv: Path = Path("results/extra/case_study_scaling.csv")):
+def analyze_qubit_scaling(output_csv: Path = None):
     """Calculates scaling of required qubit register across problem dimensions."""
+    if output_csv is None:
+        output_csv = Path(__file__).resolve().parent.parent / "results/extra/case_study_scaling.csv"
     records = []
     item_sizes = [5, 10, 20, 50, 100]
     weight_capacities = [15, 30, 60, 120, 250, 500]
@@ -201,3 +203,4 @@ if __name__ == "__main__":
     df_scaling = analyze_qubit_scaling()
     print("\nScaling table head:")
     print(df_scaling.head(10).to_string())
+

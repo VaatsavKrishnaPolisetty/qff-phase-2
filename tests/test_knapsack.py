@@ -51,3 +51,4 @@ def test_qaoa_statevector_probabilities():
     probs = Qn.probabilities(gamma=0.35, beta=0.45, diag_scaled=diag_scaled)
     assert abs(probs.sum() - 1.0) < 1e-12
     assert np.all(probs >= 0.0)
+
