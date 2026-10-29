@@ -1,0 +1,6 @@
+gate,count,duration_ns,total_ns
+1Q Virtual RZ,81,0.0,0.0
+1Q Microwave SX,27,35.55,959.8
+2Q Cross-Resonance CX,102,250.0,25500.0
+Dispersive Readout,9,700.0,6300.0
+CRITICAL_PATH_LATENCY,87,,16445.4

@@ -66,3 +66,4 @@
 
 #### Q3: "What is the physical engineering trade-off of your Processor D design?"
 * **Answer:** *"While our 4-regular circulant graph reduces graph diameter from 4 to 2 and cuts SWAPs by $41\%$, increasing the degree of every qubit to 4 creates physical wiring density challenges on planar superconducting transmon chips. More adjacent control lines increase parasitic capacitive coupling, microwave frequency allocation collision risks, and residual $ZZ$-crosstalk."*
+

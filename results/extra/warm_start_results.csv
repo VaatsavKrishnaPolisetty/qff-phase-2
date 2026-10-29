@@ -1,0 +1,3 @@
+ansatz,condition,p_feasible,p_opt,best_val,mean_cost
+Warm-Started (LP),ideal,0.7002,0.0432,26,164.33
+Warm-Started (LP),noisy,0.7239,0.0437,26,180.56

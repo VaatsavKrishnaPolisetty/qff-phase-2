@@ -1,0 +1,2 @@
+backend,condition,cx,p_feasible,p_opt,best_val,mean_qubo_cost
+IBM_9Q_Superconducting,calibrated_device_noise,102,0.9629,0.0215,26,65.02
