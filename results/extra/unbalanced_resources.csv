@@ -1,0 +1,4 @@
+processor,num_qubits,logical_qubits,physical_qubits,logical_cx,cx,cx_overhead,depth,two_q_depth,swaps
+A,5,5,5,20,32,12,59,28,4
+B,9,5,9,20,26,6,40,22,2
+D,9,5,9,20,26,6,51,24,2

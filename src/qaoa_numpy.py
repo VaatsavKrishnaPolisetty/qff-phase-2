@@ -17,7 +17,9 @@ MAXITER = 200
 SEEDS = (0, 1, 2, 3, 4)
 
 
-def qaoa_state(gamma: float, beta: float, diag_scaled: np.ndarray, n: int = K.N_QUBITS) -> np.ndarray:
+def qaoa_state(gamma: float, beta: float, diag_scaled: np.ndarray, n: int | None = None) -> np.ndarray:
+    if n is None:
+        n = int(np.round(np.log2(len(diag_scaled))))
     psi = np.full(1 << n, 1.0 / np.sqrt(1 << n), dtype=complex)
     psi = psi * np.exp(-1j * gamma * diag_scaled)
     c, s = np.cos(beta), -1j * np.sin(beta)

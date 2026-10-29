@@ -1,0 +1,7 @@
+processor,condition,executable,logical_qubits,physical_qubits,cx,depth,swaps,p_feasible,p_opt,best_feasible_value,pct_optimal
+A,ideal,True,5,5,32,59,4,0.885,0.0581,26,100.0
+A,noisy,True,5,5,32,59,4,0.8784,0.052,26,100.0
+B,ideal,True,5,9,26,40,2,0.8877,0.0627,26,100.0
+B,noisy,True,5,9,26,40,2,0.8826,0.0593,26,100.0
+D,ideal,True,5,9,26,51,2,0.8894,0.0566,26,100.0
+D,noisy,True,5,9,26,51,2,0.8838,0.052,26,100.0

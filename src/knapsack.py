@@ -137,8 +137,12 @@ def ising_diag(h, J, offset) -> np.ndarray:
 
 # ----------------------------------------------------------------- metrics from samples
 def evaluate_probs(probs: np.ndarray) -> dict:
-    """Exact metrics for a probability vector over the 512 bitstrings."""
+    """Exact metrics for a probability vector over the 512 bitstrings (or 32 for item qubits)."""
     probs = np.asarray(probs, dtype=float)
+    if len(probs) == (1 << N_ITEMS):
+        return dict(p_feasible=float(probs[ITEM_FEASIBLE].sum()),
+                    p_opt=float(probs[OPT_INDEX]),
+                    mean_qubo_cost=float(probs @ -ITEM_VALUE))
     item_idx = np.arange(1 << N_QUBITS) & ITEM_MASK
     feas = ITEM_FEASIBLE[item_idx]
     return dict(p_feasible=float(probs[feas].sum()),
