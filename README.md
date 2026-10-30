@@ -19,7 +19,6 @@ Launch our interactive visual evaluation web application:
 ./run_frontend.sh        # or: python3 run_frontend.py
 ```
 Opens `http://localhost:8080` in your browser:
-- **🎯 Guided Judge Walkthrough (Driver.js):** Interactive tour taking you through all 8 key project milestones.
 - **⚡ Interactive QAOA Playground:** Toggle item combinations, observe the 4 binary slack qubits in real-time, and verify QUBO energy calculations.
 - **🔬 Hardware & Pareto Explorer:** Visualizes our 48-topology Pareto frontier and coupling graphs (Processor A vs B vs D).
 - **📁 File Inspector (51 Files):** Complete interactive repository browser with syntax highlighting for all scripts, datasets, and reports.

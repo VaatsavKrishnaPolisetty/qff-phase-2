@@ -37,10 +37,6 @@
     }
   </script>
 
-  <!-- Driver.js for Guided Judge Walkthrough -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
-
   <!-- Marked for Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -75,36 +71,6 @@
     }
     .spotlight-card:hover {
       border-color: rgba(0, 242, 254, 0.4);
-    }
-
-    /* Driver.js Custom Popover Styling */
-    .driver-popover.driverjs-theme {
-      background: #0f172a;
-      color: #f8fafc;
-      border: 1px solid #38bdf8;
-      border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-    }
-    .driver-popover.driverjs-theme .driver-popover-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #38bdf8;
-    }
-    .driver-popover.driverjs-theme .driver-popover-description {
-      font-size: 0.92rem;
-      line-height: 1.5;
-      color: #cbd5e1;
-    }
-    .driver-popover.driverjs-theme button {
-      background: #0284c7;
-      color: white;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-weight: 600;
-      border: none;
-    }
-    .driver-popover.driverjs-theme button:hover {
-      background: #0369a1;
     }
 
     /* Shimmer Text */
@@ -173,9 +139,9 @@
 
         <!-- Action CTAs -->
         <div class="flex items-center gap-2.5">
-          <button id="start-tour-btn" onclick="startJudgeTour()" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-black bg-gradient-to-r from-brand-cyan to-teal-400 hover:opacity-95 transition shadow-lg shadow-brand-cyan/25 active:scale-95">
-            <i data-lucide="compass" class="w-4 h-4 stroke-[2.2]"></i>
-            <span>Judge Guided Tour</span>
+          <button onclick="switchTab('simulator')" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-black bg-gradient-to-r from-brand-cyan to-teal-400 hover:opacity-95 transition shadow-lg shadow-brand-cyan/25 active:scale-95">
+            <i data-lucide="sliders" class="w-4 h-4 stroke-[2.2]"></i>
+            <span>Live Playground</span>
           </button>
 
           <a href="report.pdf" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition active:scale-95">
@@ -1344,76 +1310,7 @@
       }
     }
     loadPitchScript();
-
-    // 11. Driver.js Interactive Judge Tour
-    function startJudgeTour() {
-      switchTab('overview');
-      const driverObj = window.driver.js.driver({
-        showProgress: true,
-        animate: true,
-        allowClose: true,
-        popoverClass: 'driverjs-theme',
-        steps: [
-          {
-            element: '#header-branding',
-            popover: {
-              title: 'Team Emerging Genius (PS-O3)',
-              description: 'Welcome to our evaluation hub! We engineered an end-to-end, hardware-co-designed QAOA solution for the 0/1 Knapsack Problem with zero rule violations.'
-            }
-          },
-          {
-            element: '#key-metrics-bento',
-            popover: {
-              title: 'Executive Metrics Bento Grid',
-              description: 'Ground truth V*=26 discovered (100%), 41.2% SWAP reduction on our custom Processor D, Bell state fidelity verified, and 16 automated tests passed.'
-            }
-          },
-          {
-            element: '#bell-state-card',
-            popover: {
-              title: 'Objective 1: Bell State Preparation',
-              description: 'We prepare |Phi+> across adjacent (0-1) and farthest (0-3) physical pairs, calculating fidelity via the required Pauli formula: F = (1 + <XX> - <YY> + <ZZ>) / 4.'
-            }
-          },
-          {
-            element: '#processor-d-card',
-            popover: {
-              title: 'Objective 2: Custom Processor D',
-              description: 'Our regular degree-4 circulant chordal topology reduces graph diameter from 4 to 2, eliminating 7 SWAPs and cutting physical CX gates from 121 down to 102.'
-            }
-          },
-          {
-            element: '#tab-btn-hardware',
-            popover: {
-              title: 'Hardware & Pareto Frontier',
-              description: 'Click this tab to inspect our systematic evaluation of 48 candidate topologies, demonstrating our design choice is grounded on Pareto trade-offs.'
-            }
-          },
-          {
-            element: '#tab-btn-simulator',
-            popover: {
-              title: 'Interactive Knapsack Playground',
-              description: 'Explore any combination of the 5 items, inspect the 4 logarithmic slack qubits in real time, and verify the quadratic penalty math.'
-            }
-          },
-          {
-            element: '#tab-btn-explorer',
-            popover: {
-              title: 'Repository & File Inspector (51 Files)',
-              description: 'Audit every piece of evidence: full research report, benchmark CSV tables, hardware JSON configs, source code, and automated tests.'
-            }
-          },
-          {
-            element: '#tab-btn-rubric',
-            popover: {
-              title: 'Rubric Compliance Matrix',
-              description: 'Review our complete audit table proving 100% PASS across every required criterion: G1–G4 and C1–C5.'
-            }
-          }
-        ]
-      });
-      driverObj.drive();
-    }
   </script>
 </body>
 </html>
+
