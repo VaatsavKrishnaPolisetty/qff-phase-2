@@ -279,14 +279,23 @@ Increasing nodal degree to 4 across all 9 qubits increases physical wiring densi
 ### 4.2 Benchmark Results Table
 Directly extracted from [`results/tables/results.csv`](file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results.csv) and [`results/tables/results_detail.csv`](file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results_detail.csv):
 
-| Problem | Processor | Condition | Executable | Logical Qubits | Physical Qubits | Logical CX | CX | Depth | 2Q Depth | SWAPs | CX Overhead | Shots | Quality Metric | Quality Value | $P_{\text{opt}}$ | Classical Optimum ($V^*$) | Random Baseline |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **PS-O3** | **A** | **ideal** | `false` | 9 | 5 | — | — | — | — | — | — | — | — | — | — | 26 | 0.875 |
-| **PS-O3** | **A** | **noisy** | `false` | 9 | 5 | — | — | — | — | — | — | — | — | — | — | 26 | 0.875 |
-| **PS-O3** | **B** | **ideal** | `true` | 9 | 9 | 72 | 121 | 117 | 79 | 17 | 49 | 4096 | `p_feasible` | **0.958740** | 0.020996 | 26 | 0.875 |
-| **PS-O3** | **B** | **noisy** | `true` | 9 | 9 | 72 | 121 | 117 | 79 | 17 | 49 | 4096 | `p_feasible` | **0.943359** | 0.024902 | 26 | 0.875 |
-| **PS-O3** | **D** | **ideal** | `true` | 9 | 9 | 72 | 102 | 87 | 59 | 10 | 30 | 4096 | `p_feasible` | **0.963379** | 0.022461 | 26 | 0.875 |
-| **PS-O3** | **D** | **noisy** | `true` | 9 | 9 | 72 | 102 | 87 | 59 | 10 | 30 | 4096 | `p_feasible` | **0.942139** | 0.022461 | 26 | 0.875 |
+##### Table 4.2A: Quantum Circuit Compilation & Hardware Routing Resources
+| Processor | Condition | Executable | Logical Qubits | Physical Qubits | Logical CX | Physical CX | Circuit Depth | 2Q Depth | Added SWAPs | CX Overhead |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Processor A** | ideal / noisy | `false` | 9 | 5 | — | — | — | — | — | — |
+| **Processor B** | ideal | `true` | 9 | 9 | 72 | 121 | 117 | 79 | 17 | +49 (+68.1%) |
+| **Processor B** | noisy | `true` | 9 | 9 | 72 | 121 | 117 | 79 | 17 | +49 (+68.1%) |
+| **Processor D** | ideal | `true` | 9 | 9 | 72 | 102 | 87 | 59 | 10 | +30 (+41.7%) |
+| **Processor D** | noisy | `true` | 9 | 9 | 72 | 102 | 87 | 59 | 10 | +30 (+41.7%) |
+
+##### Table 4.2B: Solution Quality, Algorithmic Feasibility & Benchmark Comparison
+| Processor | Condition | Shots | Target Quality Metric | Measured Value ($P_{\text{feasible}}$) | Optimal Ratio ($P_{\text{opt}}$) | Classical Optimum ($V^*$) | Random Feasible Baseline | Improvement over Random |
+|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Processor A** | ideal / noisy | — | `p_feasible` | **Not Executable** | — | 26 | 0.8750 (87.5%) | — |
+| **Processor B** | ideal | 4096 | `p_feasible` | **0.958740 (95.87%)** | 0.020996 (2.10%) | 26 | 0.8750 (87.5%) | +8.37% |
+| **Processor B** | noisy | 4096 | `p_feasible` | **0.943359 (94.34%)** | 0.024902 (2.49%) | 26 | 0.8750 (87.5%) | +6.84% |
+| **Processor D** | ideal | 4096 | `p_feasible` | **0.963379 (96.34%)** | 0.022461 (2.25%) | 26 | 0.8750 (87.5%) | +8.84% |
+| **Processor D** | noisy | 4096 | `p_feasible` | **0.942139 (94.21%)** | 0.022461 (2.25%) | 26 | 0.8750 (87.5%) | +6.71% |
 
 ### 4.3 Solution Quality & Random Baseline Analysis
 - **Feasible Solution Probability ($P_{\text{feasible}}$):**

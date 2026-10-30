@@ -1,4 +1,222 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>QFF 2026 Phase 2 Report</title><style>body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.65;color:#1e293b;}table{border-collapse:collapse;width:100%;margin:20px 0;}th,td{border:1px solid #cbd5e1;padding:8px 12px;text-align:left;}th{background:#f1f5f9;font-weight:600;}code{background:#f1f5f9;padding:2px 5px;border-radius:4px;font-family:monospace;font-size:0.9em;}pre code{display:block;padding:12px;overflow-x:auto;}h1,h2,h3,h4{color:#0f172a;}</style></head><body><h1>QFF 2026 Phase 2 Technical Report</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>QFF 2026 Phase 2 Technical Report — Emerging Genius</title>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 1.2cm 1.2cm 1.5cm 1.2cm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 8pt;
+        color: #64748b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 9.2pt;
+      line-height: 1.45;
+      color: #1e293b;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+
+    /* Headings */
+    h1 {
+      font-size: 19pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 2pt solid #0284c7;
+      padding-bottom: 5px;
+      margin-top: 0;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0369a1;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 3px;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+
+    h4, h5 {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+    }
+
+    p, li {
+      text-align: justify;
+      hyphens: auto;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+
+    ul, ol {
+      margin-top: 2px;
+      margin-bottom: 6px;
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 2px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #cbd5e1;
+      margin: 12px 0;
+    }
+
+    /* Code and Pre blocks */
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-size: 7.8pt;
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 1px 3.5px;
+      border-radius: 3px;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 8px 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 7.2pt;
+      line-height: 1.35;
+      margin: 8px 0;
+      page-break-inside: avoid;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+      font-size: inherit;
+    }
+
+    /* ======================================================= */
+    /* TABLES: Bulletproof width containment & formatting      */
+    /* ======================================================= */
+    .table-container {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 10px 0 !important;
+      overflow-x: hidden !important;
+      page-break-inside: avoid;
+    }
+
+    table {
+      width: 100% !important;
+      max-width: 100% !important;
+      border-collapse: collapse !important;
+      font-size: 7.2pt !important;
+      line-height: 1.25 !important;
+      table-layout: fixed !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+
+    th, td {
+      border: 0.5pt solid #cbd5e1 !important;
+      padding: 4px 5px !important;
+      vertical-align: middle !important;
+      word-break: normal !important;
+      overflow-wrap: break-word !important;
+      hyphens: auto;
+    }
+
+    th {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      font-weight: 700 !important;
+      text-align: center !important;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    /* ======================================================= */
+    /* IMAGES: Perfectly fitted & centered without margin bleed */
+    /* ======================================================= */
+    img {
+      max-width: 96% !important;
+      max-height: 18cm !important;
+      height: auto !important;
+      display: block !important;
+      margin: 12px auto !important;
+      border-radius: 6px !important;
+      border: 1px solid #cbd5e1 !important;
+      page-break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    p > img {
+      margin-bottom: 4px !important;
+    }
+
+    /* Print media adjustments */
+    @media print {
+      body {
+        background: transparent;
+      }
+      a {
+        color: #0369a1;
+        text-decoration: none;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>QFF 2026 Phase 2 Technical Report</h1>
 <h2>Quantum Optimization Track — Problem Statement PS-O3</h2>
 <h3>Resource-Constrained Item Selection (0/1 Knapsack Problem) with QAOA</h3>
 <p><strong>Team Name:</strong> Emerging Genius<br />
@@ -134,7 +352,7 @@ where $K_w = \lfloor \log_2 W \rfloor + 1$ and $K_v = \lfloor \log_2 V \rfloor +
 $$n_{\text{qubits}} = N + \lfloor\log_2 W\rfloor + 1 + \lfloor\log_2 V\rfloor + 1 = \mathcal{O}(N + \log W + \log V)$$</p>
 <h5>Qubit Register Scaling Analysis across Operational Scales</h5>
 <p>Saved in <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/extra/case_study_scaling.csv"><code>results/extra/case_study_scaling.csv</code></a>, validating practical viability across real-world problem sizes:</p>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Mission Scope</th>
@@ -199,7 +417,7 @@ $$n_{\text{qubits}} = N + \lfloor\log_2 W\rfloor + 1 + \lfloor\log_2 V\rfloor + 
 <td><strong>1.18</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Notice that as the operational scale expands to 100 industrial assets, the auxiliary slack overhead drops to only $+18\%$ over the decision register, proving that our logarithmic binary encoding prevents Hilbert-space explosion on near-term NISQ architectures.</p>
 <ul>
 <li><strong>Scale factor:</strong> $\text{scale} = \max(|h_i|, |J_{ij}|) = 120.0$.
@@ -221,7 +439,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <p>The measurements were performed on two physical pairs:
 1. <strong>Adjacent Pair $(0, 1)$:</strong> Distance 1 in the coupling graph. Transpiled circuit depth = 2, CX count = 1.
 2. <strong>Farthest Pair $(0, 3)$:</strong> Distance 2 in the coupling graph. Transpiled circuit depth = 7, CX count = 4 (requires 1 inserted SWAP gate).</p>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Pair Type</th>
@@ -281,7 +499,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td><strong>$0.9548 \pm 0.0023$</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3>2.3 Physical Interpretation</h3>
 <ul>
 <li><strong>Ideal Performance:</strong> Under noiseless conditions, both adjacent and non-adjacent pairs exhibit perfect correlation ($\langle XX \rangle = 1.0$, $\langle YY \rangle = -1.0$, $\langle ZZ \rangle = 1.0$), confirming $F = 1.0000 \pm 0.0000$.</li>
@@ -305,7 +523,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <p><img alt="Architecture Trade-Off Analysis: Pareto Frontier for Processor D" src="results/figures/pareto_design_d.png" /></p>
 <h4>Chip Cost Proxy vs. Routing Overhead (The Pareto Frontier)</h4>
 <p>On physical quantum processors, the <strong>number of coupling edges</strong> serves as a direct proxy for physical hardware cost, lithographic wiring complexity, control-line cross-routing, and fabrication yield. High-degree architectures require dense multi-layer wiring and introduce greater susceptibility to frequency collisions and residual $ZZ$-crosstalk. Conversely, sparse topologies reduce hardware cost but catastrophically amplify the circuit execution overhead:</p>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Candidate Topology</th>
@@ -418,7 +636,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td><strong>Near-Frontier Design Choice</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4>Justification for Selecting <code>circulant_n9_o1-2</code> (Processor D):</h4>
 <p>We deliberately chose <code>circulant_n9_o1-2</code> based on an engineering trade-off rather than blindly picking a lucky single-metric winner:
 1. <strong>Circuit Depth Minimization:</strong> While <code>circulant_n9_o1-3</code> saves 3 CX gates (99 vs 102), <code>circulant_n9_o1-2</code> achieves a lower total circuit depth (<strong>87 vs 90</strong>), allowing two-qubit gate layers to execute within shorter coherence windows ($T_1, T_2$).
@@ -456,152 +674,164 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 </ul>
 <h3>4.2 Benchmark Results Table</h3>
 <p>Directly extracted from <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results.csv"><code>results/tables/results.csv</code></a> and <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results_detail.csv"><code>results/tables/results_detail.csv</code></a>:</p>
-<table>
+<h5>Table 4.2A: Quantum Circuit Compilation &amp; Hardware Routing Resources</h5>
+<div class="table-container"><table>
 <thead>
 <tr>
-<th>Problem</th>
 <th>Processor</th>
 <th>Condition</th>
-<th>Executable</th>
-<th>Logical Qubits</th>
-<th>Physical Qubits</th>
-<th>Logical CX</th>
-<th>CX</th>
-<th>Depth</th>
-<th>2Q Depth</th>
-<th>SWAPs</th>
-<th>CX Overhead</th>
-<th>Shots</th>
-<th>Quality Metric</th>
-<th>Quality Value</th>
-<th>$P_{\text{opt}}$</th>
-<th>Classical Optimum ($V^*$)</th>
-<th>Random Baseline</th>
+<th style="text-align: center;">Executable</th>
+<th style="text-align: center;">Logical Qubits</th>
+<th style="text-align: center;">Physical Qubits</th>
+<th style="text-align: center;">Logical CX</th>
+<th style="text-align: center;">Physical CX</th>
+<th style="text-align: center;">Circuit Depth</th>
+<th style="text-align: center;">2Q Depth</th>
+<th style="text-align: center;">Added SWAPs</th>
+<th style="text-align: center;">CX Overhead</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>A</strong></td>
-<td><strong>ideal</strong></td>
-<td><code>false</code></td>
-<td>9</td>
-<td>5</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>26</td>
-<td>0.875</td>
+<td><strong>Processor A</strong></td>
+<td>ideal / noisy</td>
+<td style="text-align: center;"><code>false</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>A</strong></td>
-<td><strong>noisy</strong></td>
-<td><code>false</code></td>
-<td>9</td>
-<td>5</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>26</td>
-<td>0.875</td>
+<td><strong>Processor B</strong></td>
+<td>ideal</td>
+<td style="text-align: center;"><code>true</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">72</td>
+<td style="text-align: center;">121</td>
+<td style="text-align: center;">117</td>
+<td style="text-align: center;">79</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">+49 (+68.1%)</td>
 </tr>
 <tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>B</strong></td>
-<td><strong>ideal</strong></td>
-<td><code>true</code></td>
-<td>9</td>
-<td>9</td>
-<td>72</td>
-<td>121</td>
-<td>117</td>
-<td>79</td>
-<td>17</td>
-<td>49</td>
-<td>4096</td>
-<td><code>p_feasible</code></td>
-<td><strong>0.958740</strong></td>
-<td>0.020996</td>
-<td>26</td>
-<td>0.875</td>
+<td><strong>Processor B</strong></td>
+<td>noisy</td>
+<td style="text-align: center;"><code>true</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">72</td>
+<td style="text-align: center;">121</td>
+<td style="text-align: center;">117</td>
+<td style="text-align: center;">79</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">+49 (+68.1%)</td>
 </tr>
 <tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>B</strong></td>
-<td><strong>noisy</strong></td>
-<td><code>true</code></td>
-<td>9</td>
-<td>9</td>
-<td>72</td>
-<td>121</td>
-<td>117</td>
-<td>79</td>
-<td>17</td>
-<td>49</td>
-<td>4096</td>
-<td><code>p_feasible</code></td>
-<td><strong>0.943359</strong></td>
-<td>0.024902</td>
-<td>26</td>
-<td>0.875</td>
+<td><strong>Processor D</strong></td>
+<td>ideal</td>
+<td style="text-align: center;"><code>true</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">72</td>
+<td style="text-align: center;">102</td>
+<td style="text-align: center;">87</td>
+<td style="text-align: center;">59</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">+30 (+41.7%)</td>
 </tr>
 <tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>D</strong></td>
-<td><strong>ideal</strong></td>
-<td><code>true</code></td>
-<td>9</td>
-<td>9</td>
-<td>72</td>
-<td>102</td>
-<td>87</td>
-<td>59</td>
-<td>10</td>
-<td>30</td>
-<td>4096</td>
-<td><code>p_feasible</code></td>
-<td><strong>0.963379</strong></td>
-<td>0.022461</td>
-<td>26</td>
-<td>0.875</td>
-</tr>
-<tr>
-<td><strong>PS-O3</strong></td>
-<td><strong>D</strong></td>
-<td><strong>noisy</strong></td>
-<td><code>true</code></td>
-<td>9</td>
-<td>9</td>
-<td>72</td>
-<td>102</td>
-<td>87</td>
-<td>59</td>
-<td>10</td>
-<td>30</td>
-<td>4096</td>
-<td><code>p_feasible</code></td>
-<td><strong>0.942139</strong></td>
-<td>0.022461</td>
-<td>26</td>
-<td>0.875</td>
+<td><strong>Processor D</strong></td>
+<td>noisy</td>
+<td style="text-align: center;"><code>true</code></td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">72</td>
+<td style="text-align: center;">102</td>
+<td style="text-align: center;">87</td>
+<td style="text-align: center;">59</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">+30 (+41.7%)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
+<h5>Table 4.2B: Solution Quality, Algorithmic Feasibility &amp; Benchmark Comparison</h5>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>Processor</th>
+<th>Condition</th>
+<th style="text-align: center;">Shots</th>
+<th style="text-align: center;">Target Quality Metric</th>
+<th style="text-align: center;">Measured Value ($P_{\text{feasible}}$)</th>
+<th style="text-align: center;">Optimal Ratio ($P_{\text{opt}}$)</th>
+<th style="text-align: center;">Classical Optimum ($V^*$)</th>
+<th style="text-align: center;">Random Feasible Baseline</th>
+<th style="text-align: center;">Improvement over Random</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Processor A</strong></td>
+<td>ideal / noisy</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;"><code>p_feasible</code></td>
+<td style="text-align: center;"><strong>Not Executable</strong></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">0.8750 (87.5%)</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td><strong>Processor B</strong></td>
+<td>ideal</td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;"><code>p_feasible</code></td>
+<td style="text-align: center;"><strong>0.958740 (95.87%)</strong></td>
+<td style="text-align: center;">0.020996 (2.10%)</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">0.8750 (87.5%)</td>
+<td style="text-align: center;">+8.37%</td>
+</tr>
+<tr>
+<td><strong>Processor B</strong></td>
+<td>noisy</td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;"><code>p_feasible</code></td>
+<td style="text-align: center;"><strong>0.943359 (94.34%)</strong></td>
+<td style="text-align: center;">0.024902 (2.49%)</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">0.8750 (87.5%)</td>
+<td style="text-align: center;">+6.84%</td>
+</tr>
+<tr>
+<td><strong>Processor D</strong></td>
+<td>ideal</td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;"><code>p_feasible</code></td>
+<td style="text-align: center;"><strong>0.963379 (96.34%)</strong></td>
+<td style="text-align: center;">0.022461 (2.25%)</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">0.8750 (87.5%)</td>
+<td style="text-align: center;">+8.84%</td>
+</tr>
+<tr>
+<td><strong>Processor D</strong></td>
+<td>noisy</td>
+<td style="text-align: center;">4096</td>
+<td style="text-align: center;"><code>p_feasible</code></td>
+<td style="text-align: center;"><strong>0.942139 (94.21%)</strong></td>
+<td style="text-align: center;">0.022461 (2.25%)</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">0.8750 (87.5%)</td>
+<td style="text-align: center;">+6.71%</td>
+</tr>
+</tbody>
+</table></div>
 <h3>4.3 Solution Quality &amp; Random Baseline Analysis</h3>
 <ul>
 <li><strong>Feasible Solution Probability ($P_{\text{feasible}}$):</strong></li>
@@ -621,7 +851,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <p><img alt="Objective Landscape" src="results/figures/landscape_D.png" /></p>
 <h3>5.1 Seed Optimization Dynamics</h3>
 <p>Five pseudorandom starting angles were drawn according to the official protocol $\gamma_0, \beta_0 \sim U[0, \pi]$ using NumPy's <code>default_rng(seed)</code>:</p>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Seed</th>
@@ -692,7 +922,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>0.0311</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3>5.2 Landscape Topography &amp; Noise Flattening</h3>
 <ul>
 <li><strong>Global Optimum Location:</strong> The COBYLA optimizer converged from Seed 1 to the global minimum at $(\gamma^<em> = 0.2831, \beta^</em> = 2.8648)$ with expectation $-1.5232$. This matches the noisy sampled landscape grid, where the grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.</li>
@@ -747,7 +977,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <li><strong>Conditional Value-at-Risk (CVaR) QAOA:</strong>
    Instead of minimising the mean cost $\langle C \rangle$, CVaR-QAOA minimises the average of the worst $\alpha$ fraction of outcomes (Rockafellar–Uryasev formulation). This tail-focused objective forces the optimizer to push probability mass away from high-cost states and toward low-cost (good) states. We swept $\alpha \in {0.05, 0.1, 0.2, 0.3}$ with the same 5 seeds (0–4):</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>$\alpha$</th>
@@ -787,13 +1017,13 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>0.83</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>At $\alpha = 0.3$, CVaR-QAOA achieves $P_{\text{opt}} = 0.0404$, a <strong>$29\%$ improvement</strong> over the uniform random baseline ($0.03125$) and a <strong>$79\%$ improvement</strong> over the standard QAOA best seed ($0.0225$). This demonstrates that tail-aware cost functions can extract better solution quality from the same $p=1$ circuit depth.</p>
 <ol>
 <li><strong>Measurement Error Mitigation (MEM):</strong>
    The official readout noise ($p_{\text{readout}} = 0.01$ per qubit) creates a $\sim 2\%$ parity-flip probability per shot. We constructed the $2^9 \times 2^9$ bit-flip transition matrix $M$, inverted it via least-squares, and applied $M^{-1}$ to the observed noisy counts:</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Processor</th>
@@ -833,13 +1063,13 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>72.31</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>MEM reduces the mean QUBO cost by $\sim 3\%$ on both processors, recovering part of the noise-induced degradation. The effect on $P_{\text{opt}}$ is small because the 1% readout error affects all states roughly equally.</p>
 <ol>
 <li><strong>Problem-Aware Processor D (Architecture-Algorithm Co-Design):</strong>
    Instead of the generic circulant $C_9(1,2)$, we co-designed a topology that places the strongest $|J_{ij}|$ couplings at graph distance 1, minimizing routing overhead for the highest-weight ZZ terms. The algorithm uses Kruskal-style spanning tree construction with strongest edges first, then greedily fills remaining degree budget:</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Topology</th>
@@ -868,14 +1098,14 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td><strong>0.0237</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>The co-designed topology reduces CX count by <strong>12%</strong>, depth by <strong>10%</strong>, and SWAPs by <strong>20%</strong>, while also improving noisy $P_{\text{feasible}}$ and $P_{\text{opt}}$. This validates the principle that hardware should be designed with the problem's interaction structure in mind.</p>
 <p><img alt="Problem-Aware Processor D Architecture" src="results/figures/problem_aware_D_graph.png" /></p>
 <ol>
 <li><strong>Constraint-Preserving Mixer QAOA:</strong>
    We replaced the standard transverse-field mixer $R_X(2\beta)$ with an $XY$ (partial-swap) mixer on pairs of qubits whose constraint coefficients are equal: $(q_2, q_7)$ both have weight 4, and $(q_3, q_6)$ both have weight 2. Swapping equal-weight qubits preserves the linear constraint $c^T y = 15$ exactly, so the state never leaves the feasible subspace. The initial state is a uniform superposition over the 28 feasible states (each paired with exact slack):</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Mixer</th>
@@ -915,7 +1145,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>861</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>In the ideal case, the CP mixer achieves <strong>$100\%$ feasibility</strong> and a <strong>$3.3\times$ improvement</strong> in $P_{\text{opt}}$ (from $2.25\%$ to $7.47\%$, <strong>$2.4\times$ the random baseline</strong>). The CX count is higher (861 vs 102) because the <code>initialize</code> instruction and the RXX/RYY mixer gates are more expensive than the simple RX mixer, making the circuit more noise-sensitive. Under noise, $P_{\text{feasible}}$ drops to $90\%$ but $P_{\text{opt}}$ still improves to $2.86\%$, beating the standard mixer's $2.25\%$. This demonstrates the fundamental trade-off: constraint-preserving mixers guarantee feasibility in principle, but the deeper circuit exposes the state to more depolarizing noise.</p>
 <h3>6.5 Advanced Algorithmic Extensions</h3>
 <p>Beyond the improvements discussed above, we implemented five additional algorithmic experiments:</p>
@@ -923,7 +1153,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <li><strong>Multi-Angle QAOA (ma-QAOA):</strong>
    Standard $p=1$ uses 2 parameters. ma-QAOA assigns each of the 9 single-qubit $R_Z$ gates, 36 two-qubit $R_{ZZ}$ gates, and 9 mixer $R_X$ gates its own variational parameter (54 total), warm-started from the standard QAOA optimum. The best seed achieves $P_{\text{opt}} = 0.0552$ (<strong>$2.4\times$ the random baseline</strong>), but most seeds concentrate probability on non-optimal low-cost states ($P_{\text{opt}} \approx 0.001$). This reveals a key trade-off: extra expressiveness improves the energy landscape ($\langle C \rangle$ drops from $-1.52$ to $-1.87$) but can overfit to a single non-optimal state rather than the global optimum.</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Method</th>
@@ -946,12 +1176,12 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>$-1.868$</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <ol>
 <li><strong>CVaR + Constraint-Preserving Mixer Combined:</strong>
    The two strongest individual techniques are orthogonal and stack: the CP mixer guarantees $P_{\text{feasible}} = 100\%$ (ansatz constraint), while CVaR focuses the optimizer on the tail (cost function). Sweeping $\alpha$:</li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>$\alpha$</th>
@@ -981,7 +1211,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td><strong>0.0712</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>At $\alpha = 0.3$, the combined method achieves $P_{\text{opt}} = 7.12\%$ with <strong>guaranteed $100\%$ feasibility</strong> — $3.2\times$ the standard QAOA and $2.3\times$ the random baseline, with no infeasible shots at all.</p>
 <ol>
 <li>
@@ -993,7 +1223,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
    The schedule $P = 1 \to 2 \to 3 \to 4 \to 5$ uses the previous $P$'s optimum as the warm start for the next:</p>
 </li>
 </ol>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>$P$</th>
@@ -1046,7 +1276,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td>1</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>At $P=5$ via homotopy, $P_{\text{feasible}} = 0.955$ (comparable to the best standard seed at $0.955$) but with only <strong>1 optimization start</strong> instead of 5 — the warm start completely avoids the seed-stuck problem where 3 of 5 seeds fail at $P=5$.</p>
 <ol>
 <li><strong>Grover Adaptive Search (GAS):</strong> (described above in Section 6.5 introduction)</li>
@@ -1080,7 +1310,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <h2>8. Compliance, Claims vs. Evidence, and Verification Sign-Off</h2>
 <h3>8.1 Claims vs. Evidence Verification Matrix</h3>
 <p>The table below maps every quantitative claim, rubric requirement, and experimental finding directly to verifiable artifacts in the repository:</p>
-<table>
+<div class="table-container"><table>
 <thead>
 <tr>
 <th>Rubric Criterion / Claim</th>
@@ -1187,10 +1417,12 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <td><strong>PASS</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3>8.2 Compliance and Verification Sign-Off</h3>
 <ul>
 <li><strong>Hard Rules Integrity:</strong> <code>qff_phase2.py</code> was preserved completely unmodified. Official settings (<code>rz, sx, x, cx</code>, <code>optimization_level=1</code>, SABRE, <code>seed_transpiler=42</code>, <code>seed_simulator=42</code>, 4096 shots, official noise) were maintained across all required benchmark runs.</li>
 <li><strong>Cross-Check:</strong> All project metrics match the official <code>qff_phase2.py</code> functions exactly (Section 7). No discrepancy was found in circuit metrics, Bell correlations, or Processor D validation.</li>
 <li><strong>Reproducibility:</strong> Executable top-to-bottom via <code>jupyter nbconvert --to notebook --execute main.ipynb --output main_executed.ipynb</code> with complete numerical consistency across all tables and figures. Total execution runtime is well under the 30-minute limit.</li>
-</ul></body></html>
+</ul>
+</body>
+</html>
