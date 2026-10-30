@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you evaluate or build upon this research and implementation, please cite it as below."
+authors:
+  - family-names: "Polisetty"
+    given-names: "Vaatsav Krishna"
+    affiliation: "Team Emerging Genius"
+title: "Quantum Approximate Optimization Algorithm (QAOA) for 0/1 Knapsack with Custom Hardware Co-Design"
+version: 2.0.0
+date-released: 2026-10-30
+url: "https://github.com/VaatsavKrishnaPolisetty/qff-phase-2"
+keywords:
+  - "quantum computing"
+  - "qaoa"
+  - "qiskit"
+  - "knapsack problem"
+  - "qubo"
+  - "hardware co-design"
+  - "quantum optimization"
+  - "qff-2026"
+license: "Apache-2.0"

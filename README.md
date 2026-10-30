@@ -1,6 +1,14 @@
 # QFF 2026 — Quantum Optimization — PS-O3: Resource-Constrained Item Selection (0/1 Knapsack)
 
-**Team:** Emerging Genius  |  **Problem statement:** PS-O3 (only this one)  |  **Repo frozen at:** final commit before 5:40 PM IST, Day 2
+[![CI Verification](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2/actions/workflows/ci.yml/badge.svg)](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2/actions/workflows/ci.yml)
+[![Pages Deployment](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2/actions/workflows/pages.yml/badge.svg)](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2/actions/workflows/pages.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Qiskit](https://img.shields.io/badge/Qiskit-2.6.1-6929C4.svg)](https://qiskit.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
+[![Team](https://img.shields.io/badge/Team-Emerging%20Genius-00f2fe.svg)](#)
+[![Track](https://img.shields.io/badge/Problem%20Statement-PS--O3-8b5cf6.svg)](#)
+
+**Team:** Emerging Genius  |  **Problem Statement:** PS-O3 (0/1 Knapsack exclusively)  |  **Repository:** [github.com/VaatsavKrishnaPolisetty/qff-phase-2](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2)
 
 ## How to run (judges: follow exactly)
 ```bash
