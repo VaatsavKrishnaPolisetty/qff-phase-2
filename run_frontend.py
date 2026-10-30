@@ -13,6 +13,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         frontend_dir = Path(__file__).resolve().parent / "frontend"
         super().__init__(*args, directory=str(frontend_dir), **kwargs)
 
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        super().end_headers()
+
 def run():
     socketserver.TCPServer.allow_reuse_address = True
     try:

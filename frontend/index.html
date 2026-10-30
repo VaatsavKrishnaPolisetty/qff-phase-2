@@ -37,21 +37,24 @@
     }
   </script>
 
-  <!-- Marked for Markdown rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Markdown rendering: Local bundle with CDN fallback -->
+  <script src="marked.min.js"></script>
+  <script>if (typeof marked === 'undefined') { document.write('<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\\/script>'); }</script>
 
-  <!-- PrismJS for Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+  <!-- PrismJS syntax highlighting: Local bundle with CDN fallback -->
+  <link rel="stylesheet" href="prism-tomorrow.min.css"/>
+  <script src="prism.min.js"></script>
+  <script>if (typeof Prism === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"><\\/script>'); }</script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Lucide Icons: Local bundle with CDN fallback -->
+  <script src="lucide.min.js"></script>
+  <script>if (typeof lucide === 'undefined') { document.write('<script src="https://unpkg.com/lucide@latest"><\\/script>'); }</script>
 
-  <!-- Project Data Bundle -->
-  <script src="projectData.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="confetti.min.js"></script>
+
+  <!-- Project Data Bundle with Timestamp Cache-Buster -->
+  <script src="projectData.js?v=20261030_02"></script>
 
   <style>
     /* Custom Scrollbars */
@@ -668,7 +671,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="figures-grid">
+        <div class="flex flex-col space-y-8" id="figures-grid">
           <!-- Populated by JS -->
         </div>
 
@@ -860,83 +863,154 @@
 
   <!-- Application Logic -->
   <script>
-    // 1. Initialize Lucide Icons
-    lucide.createIcons();
+    // Safe Lucide icon initializer
+    function safeLucide() {
+      try {
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      } catch (err) {
+        console.warn('Lucide icon rendering notice:', err);
+      }
+    }
 
-    // 2. React Bits: Mouse Spotlight Card Effect
-    document.querySelectorAll('.spotlight-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        card.style.setProperty('--mouse-x', `${x}%`);
-        card.style.setProperty('--mouse-y', `${y}%`);
-      });
-    });
-
-    // 3. React Bits: Particle / Quantum Node Background Canvas
-    (function initQuantumCanvas() {
-      const canvas = document.getElementById('quantum-canvas');
-      const ctx = canvas.getContext('2d');
-      let width = canvas.width = window.innerWidth;
-      let height = canvas.height = window.innerHeight;
-
-      window.addEventListener('resize', () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      });
-
-      const nodes = Array.from({ length: 42 }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 2 + 1.2
-      }));
-
-      function render() {
-        ctx.clearRect(0, 0, width, height);
-
-        for (let i = 0; i < nodes.length; i++) {
-          const a = nodes[i];
-          a.x += a.vx;
-          a.y += a.vy;
-
-          if (a.x < 0 || a.x > width) a.vx *= -1;
-          if (a.y < 0 || a.y > height) a.vy *= -1;
-
-          ctx.fillStyle = '#00f2fe';
-          ctx.beginPath();
-          ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
-          ctx.fill();
-
-          for (let j = i + 1; j < nodes.length; j++) {
-            const b = nodes[j];
-            const dx = a.x - b.x;
-            const dy = a.y - b.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 130) {
-              ctx.strokeStyle = `rgba(139, 92, 246, ${1 - dist / 130 * 0.9})`;
-              ctx.lineWidth = 0.6;
-              ctx.beginPath();
-              ctx.moveTo(a.x, a.y);
-              ctx.lineTo(b.x, b.y);
-              ctx.stroke();
-            }
+    // Bulletproof Markdown Parser with zero-dependency fallback
+    function safeMarkdown(text) {
+      if (!text) return '';
+      try {
+        if (typeof marked !== 'undefined') {
+          if (typeof marked.parse === 'function') {
+            return marked.parse(String(text));
+          }
+          if (typeof marked === 'function') {
+            return marked(String(text));
           }
         }
-        requestAnimationFrame(render);
+      } catch (e) {
+        console.warn('marked parse notice, falling back:', e);
       }
-      render();
+      
+      // Resilient zero-dependency fallback parser
+      let out = String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      // Code blocks
+      out = out.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gim, '<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto my-2 font-mono text-[11px] text-brand-cyan"><code>$2</code></pre>');
+      // Inline code
+      out = out.replace(/`([^`]+)`/gim, '<code class="px-1.5 py-0.5 rounded bg-white/10 font-mono text-[11px] text-brand-cyan">$1</code>');
+      
+      // Headings
+      out = out.replace(/^### (.*$)/gim, '<h3 class="text-sm font-bold text-brand-cyan mt-3 mb-1.5">$1</h3>');
+      out = out.replace(/^## (.*$)/gim, '<h2 class="text-base font-bold text-white mt-4 mb-2">$1</h2>');
+      out = out.replace(/^# (.*$)/gim, '<h1 class="text-lg font-extrabold text-white mt-4 mb-2">$1</h1>');
+      
+      // Bold & Italics
+      out = out.replace(/\*\*(.*?)\*\*/gim, '<strong class="text-white font-semibold">$1</strong>');
+      out = out.replace(/\*(.*?)\*/gim, '<em class="text-slate-200">$1</em>');
+      
+      // Bullet and numbered lists
+      out = out.replace(/^\s*[-*]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-300 text-xs">$1</li>');
+      out = out.replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-300 text-xs">$1</li>');
+      
+      // Line breaks
+      out = out.replace(/\n\n+/g, '<br/><br/>');
+      out = out.replace(/\n/g, '<br/>');
+      return out;
+    }
+
+    // Isolated safe component runner
+    function safeInit(componentName, fn) {
+      try {
+        fn();
+      } catch (err) {
+        console.error(`Error initializing ${componentName}:`, err);
+      }
+    }
+
+    // 1. Mouse Spotlight Card Effect (React Bits)
+    function initSpotlightCards() {
+      document.querySelectorAll('.spotlight-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty('--mouse-x', `${x}%`);
+          card.style.setProperty('--mouse-y', `${y}%`);
+        });
+      });
+    }
+
+    // 2. Quantum Node Background Canvas
+    (function initQuantumCanvas() {
+      try {
+        const canvas = document.getElementById('quantum-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        });
+
+        const nodes = Array.from({ length: 36 }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          radius: Math.random() * 2 + 1.2
+        }));
+
+        function render() {
+          ctx.clearRect(0, 0, width, height);
+
+          for (let i = 0; i < nodes.length; i++) {
+            const a = nodes[i];
+            a.x += a.vx;
+            a.y += a.vy;
+
+            if (a.x < 0 || a.x > width) a.vx *= -1;
+            if (a.y < 0 || a.y > height) a.vy *= -1;
+
+            ctx.fillStyle = '#00f2fe';
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            for (let j = i + 1; j < nodes.length; j++) {
+              const b = nodes[j];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < 130) {
+                ctx.strokeStyle = `rgba(139, 92, 246, ${1 - dist / 130 * 0.9})`;
+                ctx.lineWidth = 0.6;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(render);
+        }
+        render();
+      } catch (e) {
+        console.warn('Canvas init notice:', e);
+      }
     })();
 
-    // 4. Tab Navigation Controller
+    // 3. Tab Navigation Controller
     const TABS = ['overview', 'hardware', 'simulator', 'figures', 'explorer', 'rubric', 'pitch'];
     function switchTab(tabId) {
       TABS.forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         const content = document.getElementById(`tab-content-${t}`);
+        if (!btn || !content) return;
         if (t === tabId) {
           btn.classList.add('text-brand-cyan', 'bg-brand-cyan/10', 'border', 'border-brand-cyan/30');
           btn.classList.remove('text-slate-400');
@@ -947,26 +1021,29 @@
           content.classList.add('hidden');
         }
       });
-      lucide.createIcons();
+      safeLucide();
     }
 
-    // 5. Animated Number Counters (React Bits)
-    document.querySelectorAll('.counter').forEach(el => {
-      const target = parseFloat(el.getAttribute('data-target'));
-      let current = 0;
-      const step = target / 35;
-      const timer = setInterval(() => {
-        current += step;
-        if (current >= target) {
-          el.innerText = target % 1 === 0 ? target : target.toFixed(1);
-          clearInterval(timer);
-        } else {
-          el.innerText = target % 1 === 0 ? Math.floor(current) : current.toFixed(1);
-        }
-      }, 25);
-    });
+    // 4. Animated Number Counters
+    function initCounters() {
+      document.querySelectorAll('.counter').forEach(el => {
+        const target = parseFloat(el.getAttribute('data-target'));
+        if (isNaN(target)) return;
+        let current = 0;
+        const step = target / 35;
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) {
+            el.innerText = target % 1 === 0 ? target : target.toFixed(1);
+            clearInterval(timer);
+          } else {
+            el.innerText = target % 1 === 0 ? Math.floor(current) : current.toFixed(1);
+          }
+        }, 25);
+      });
+    }
 
-    // 6. Interactive 0/1 Knapsack Simulator
+    // 5. Interactive 0/1 Knapsack Simulator
     const KNAPSACK_ITEMS = [
       { id: 1, name: "Trauma & Surgical Medical Kit", value: 10, weight: 5, vol: 3, checked: true },
       { id: 2, name: "Potable Water Purification Units", value: 4, weight: 3, vol: 4, checked: true },
@@ -977,97 +1054,87 @@
 
     function renderSimItems() {
       const container = document.getElementById('items-container');
+      if (!container) return;
       container.innerHTML = KNAPSACK_ITEMS.map((item, idx) => `
-        <label class="flex items-center justify-between p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border ${item.checked ? 'border-brand-cyan/40 bg-brand-cyan/5' : 'border-white/10'} cursor-pointer transition select-none">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition">
           <div class="flex items-center gap-3">
-            <input type="checkbox" onchange="toggleItem(${idx})" ${item.checked ? 'checked' : ''} class="w-4 h-4 rounded text-brand-cyan focus:ring-0 bg-transparent border-white/20">
+            <input type="checkbox" id="item-${idx}" ${item.checked ? 'checked' : ''} onchange="toggleItem(${idx})" class="w-4 h-4 rounded text-brand-cyan bg-white/10 border-white/20 focus:ring-brand-cyan cursor-pointer">
             <div>
-              <div class="text-xs font-semibold text-white flex items-center gap-1.5">
-                <span>Item ${item.id}: ${item.name}</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300">q${idx}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 mt-0.5">Value: <strong class="text-brand-cyan">${item.value}</strong> pts · Weight: <strong>${item.weight} kg</strong> · Vol: ${item.vol} L</div>
+              <label for="item-${idx}" class="text-xs font-semibold text-white cursor-pointer select-none">${item.name}</label>
+              <div class="text-[11px] text-slate-400 font-mono">Weight: ${item.weight} kg | Value: ${item.value} pts</div>
             </div>
           </div>
-          <span class="text-xs font-mono font-bold ${item.checked ? 'text-brand-cyan' : 'text-slate-500'}">
-            ${item.checked ? '|1>' : '|0>'}
-          </span>
-        </label>
+          <span class="text-xs font-bold font-mono text-brand-cyan">x_${idx}</span>
+        </div>
       `).join('');
-      updateSimTelemetry();
+      updateSimulator();
     }
 
     function toggleItem(idx) {
       KNAPSACK_ITEMS[idx].checked = !KNAPSACK_ITEMS[idx].checked;
-      renderSimItems();
+      updateSimulator();
     }
 
-    function setOptimalCombo() {
-      KNAPSACK_ITEMS[0].checked = true;
-      KNAPSACK_ITEMS[1].checked = true;
-      KNAPSACK_ITEMS[2].checked = true;
-      KNAPSACK_ITEMS[3].checked = true;
-      KNAPSACK_ITEMS[4].checked = false;
-      renderSimItems();
-    }
+    function updateSimulator() {
+      let totalWeight = 0;
+      let totalValue = 0;
 
-    function updateSimTelemetry() {
-      const activeItems = KNAPSACK_ITEMS.filter(i => i.checked);
-      const totalWeight = activeItems.reduce((acc, i) => acc + i.weight, 0);
-      const totalValue = activeItems.reduce((acc, i) => acc + i.value, 0);
-      const isFeasible = totalWeight <= 15;
-
-      const neededSlack = isFeasible ? (15 - totalWeight) : 0;
-      const s0 = (neededSlack >> 0) & 1;
-      const s1 = (neededSlack >> 1) & 1;
-      const s2 = (neededSlack >> 2) & 1;
-      const s3 = (neededSlack >> 3) & 1;
-
-      document.getElementById('slack-bit-0').innerText = s0;
-      document.getElementById('slack-bit-1').innerText = s1;
-      document.getElementById('slack-bit-2').innerText = s2;
-      document.getElementById('slack-bit-3').innerText = s3;
-      
-      [s0, s1, s2, s3].forEach((bit, i) => {
-        const el = document.getElementById(`slack-bit-${i}`);
-        el.className = `text-lg font-bold mt-1 ${bit ? 'text-brand-cyan' : 'text-slate-500'}`;
+      KNAPSACK_ITEMS.forEach(it => {
+        if (it.checked) {
+          totalWeight += it.weight;
+          totalValue += it.value;
+        }
       });
 
-      document.getElementById('slack-value-badge').innerText = `Slack = ${neededSlack} kg (Represented as ${s0}+${s1*2}+${s2*4}+${s3*8})`;
+      const s0 = document.getElementById('sim-s0') ? (document.getElementById('sim-s0').checked ? 1 : 0) : 0;
+      const s1 = document.getElementById('sim-s1') ? (document.getElementById('sim-s1').checked ? 1 : 0) : 0;
+      const s2 = document.getElementById('sim-s2') ? (document.getElementById('sim-s2').checked ? 1 : 0) : 0;
+      const s3 = document.getElementById('sim-s3') ? (document.getElementById('sim-s3').checked ? 1 : 0) : 0;
 
-      document.getElementById('sim-weight').innerText = `${totalWeight} / 15 kg`;
-      const pct = Math.min(100, (totalWeight / 15) * 100);
+      const isFeasible = totalWeight <= 15;
+      const pct = Math.min((totalWeight / 15) * 100, 100);
+
+      const weightEl = document.getElementById('sim-weight');
+      if (weightEl) weightEl.innerText = `${totalWeight} / 15 kg`;
+      
       const bar = document.getElementById('sim-weight-bar');
-      bar.style.width = `${pct}%`;
-      bar.className = `h-2 rounded-full transition-all duration-300 ${isFeasible ? 'bg-brand-cyan' : 'bg-rose-500'}`;
+      if (bar) {
+        bar.style.width = `${pct}%`;
+        bar.className = `h-2 rounded-full transition-all duration-300 ${isFeasible ? 'bg-brand-cyan' : 'bg-rose-500'}`;
+      }
 
-      document.getElementById('sim-value').innerText = `${totalValue} pts`;
+      const valEl = document.getElementById('sim-value');
+      if (valEl) valEl.innerText = `${totalValue} pts`;
 
-      // QUBO cost: -Value + P * (W + slack - 15)^2
       const slackActual = s0 + 2*s1 + 4*s2 + 8*s3;
       const penaltyViolation = Math.pow(totalWeight + slackActual - 15, 2);
       const cost = -totalValue + 5 * penaltyViolation;
 
-      document.getElementById('sim-energy').innerText = `${cost.toFixed(1)} ${cost === -26 ? '(Global Optimum V*=26!)' : ''}`;
-      document.getElementById('sim-energy').className = `text-base font-bold font-mono ${cost === -26 ? 'text-emerald-400 font-extrabold' : (isFeasible ? 'text-brand-cyan' : 'text-rose-400')}`;
+      const energyEl = document.getElementById('sim-energy');
+      if (energyEl) {
+        energyEl.innerText = `${cost.toFixed(1)} ${cost === -26 ? '(Global Optimum V*=26!)' : ''}`;
+        energyEl.className = `text-base font-bold font-mono ${cost === -26 ? 'text-emerald-400 font-extrabold' : (isFeasible ? 'text-brand-cyan' : 'text-rose-400')}`;
+      }
 
       const itemBits = KNAPSACK_ITEMS.map(i => i.checked ? '1' : '0').join('');
       const slackBits = `${s0}${s1}${s2}${s3}`;
-      document.getElementById('sim-bitstring').innerText = `|${itemBits} ${slackBits}>`;
+      const bitstringEl = document.getElementById('sim-bitstring');
+      if (bitstringEl) bitstringEl.innerText = `|${itemBits} ${slackBits}>`;
 
       const pill = document.getElementById('sim-feasibility-pill');
-      if (isFeasible) {
-        pill.className = "p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-2 text-xs font-semibold";
-        pill.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i><span>Strictly Feasible (Weight <= 15 kg)</span>';
-      } else {
-        pill.className = "p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center gap-2 text-xs font-semibold";
-        pill.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4"></i><span>Infeasible: Exceeds 15 kg Limit!</span>';
+      if (pill) {
+        if (isFeasible) {
+          pill.className = "p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-2 text-xs font-semibold";
+          pill.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i><span>Strictly Feasible (Weight <= 15 kg)</span>';
+        } else {
+          pill.className = "p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center gap-2 text-xs font-semibold";
+          pill.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4"></i><span>Infeasible: Exceeds 15 kg Limit!</span>';
+        }
       }
-      lucide.createIcons();
+      safeLucide();
     }
-    renderSimItems();
 
-    // 7. Figure Gallery Renderer & Deep Study Modal
+    // 6. Figure Gallery Renderer: ONE PICTURE AFTER THE OTHER (Left: Picture, Right: Details & FAQs)
     let activeFigureCategory = 'All';
 
     function filterFigureCategory(cat) {
@@ -1086,120 +1153,154 @@
 
     function renderFigures() {
       const grid = document.getElementById('figures-grid');
-      if (!window.PROJECT_DATA || !window.PROJECT_DATA.figures) return;
+      if (!grid) return;
+      if (!window.PROJECT_DATA || !window.PROJECT_DATA.figures || window.PROJECT_DATA.figures.length === 0) {
+        grid.innerHTML = '<div class="p-8 text-center text-slate-400 bg-white/5 rounded-2xl border border-white/5">Loading visual artifacts...</div>';
+        return;
+      }
 
       const figs = window.PROJECT_DATA.figures.filter(f => {
         if (activeFigureCategory === 'All') return true;
         return f.category === activeFigureCategory;
       });
 
-      grid.innerHTML = figs.map(fig => `
-        <div class="spotlight-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4">
-          
-          <!-- Card Header & Badges -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/25">
-                ${fig.category}
-              </span>
-              <span class="text-[11px] font-mono text-slate-400">${fig.filename}</span>
-            </div>
+      // Split 2-column horizontal cards: Left image, Right full details
+      grid.innerHTML = figs.map((fig, idx) => `
+        <article class="spotlight-card rounded-2xl p-6 lg:p-8 border border-white/10 bg-slate-900/60 shadow-xl transition-all duration-300 hover:border-brand-cyan/30">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
-            <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">${fig.title}</h3>
-            ${fig.subtitle ? `<p class="text-xs text-brand-cyan/90 font-medium">${fig.subtitle}</p>` : ''}
-            
-            <!-- Quick Badges -->
-            ${fig.badges ? `
-              <div class="flex flex-wrap gap-1.5 pt-1">
-                ${fig.badges.map(b => `<span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 font-mono border border-white/5">${b}</span>`).join('')}
-              </div>
-            ` : ''}
-          </div>
-
-          <!-- Thumbnail Image -->
-          <div class="relative rounded-xl overflow-hidden bg-black/50 border border-white/10 aspect-video flex items-center justify-center cursor-pointer group" onclick="openFigureModal('${fig.id}')">
-            <img src="figures/${fig.filename}" alt="${fig.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-              <span class="px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-xs font-semibold text-white border border-white/20 flex items-center gap-1.5 shadow-xl">
-                <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-brand-cyan"></i>
-                Inspect Full Dossier
-              </span>
-            </div>
-          </div>
-
-          <!-- Description Summary -->
-          <p class="text-xs text-slate-300 leading-relaxed">${fig.desc}</p>
-
-          <!-- Quick Accordions on Card (Searchable via <details>) -->
-          <div class="space-y-2 pt-1 border-t border-white/5">
-            <details class="group bg-white/5 rounded-xl p-3 border border-white/5 text-xs">
-              <summary class="font-bold text-brand-cyan cursor-pointer flex justify-between items-center select-none">
-                <span class="flex items-center gap-1.5">
-                  <i data-lucide="search" class="w-3.5 h-3.5"></i>
-                  <span>What is this? (Visual Breakdown)</span>
+            <!-- LEFT COLUMN: Scientific Visual / Diagram (5 cols) -->
+            <div class="lg:col-span-5 flex flex-col space-y-3">
+              
+              <!-- Badges & Filename Header -->
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30">
+                  ${fig.category}
                 </span>
-                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition group-open:rotate-180 text-slate-400"></i>
-              </summary>
-              <div class="mt-2 text-slate-300 leading-relaxed pt-2 border-t border-white/5 text-[11px]">
-                ${marked.parse(fig.what)}
+                <span class="text-[11px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/5">${fig.filename}</span>
               </div>
-            </details>
 
-            <details class="group bg-white/5 rounded-xl p-3 border border-white/5 text-xs">
-              <summary class="font-bold text-purple-300 cursor-pointer flex justify-between items-center select-none">
-                <span class="flex items-center gap-1.5">
-                  <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
-                  <span>Why do we need it? (Rubric & Rationale)</span>
-                </span>
-                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition group-open:rotate-180 text-slate-400"></i>
-              </summary>
-              <div class="mt-2 text-slate-300 leading-relaxed pt-2 border-t border-white/5 text-[11px]">
-                ${marked.parse(fig.why)}
-              </div>
-            </details>
-
-            ${fig.faqs && fig.faqs.length > 0 ? `
-              <details class="group bg-white/5 rounded-xl p-3 border border-white/5 text-xs">
-                <summary class="font-bold text-teal-400 cursor-pointer flex justify-between items-center select-none">
-                  <span class="flex items-center gap-1.5">
-                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-                    <span>FAQs (${fig.faqs.length} Questions Answered)</span>
+              <!-- Main Image Preview with Interactive Hover Zoom -->
+              <div class="relative rounded-xl overflow-hidden bg-black/60 border border-white/10 aspect-[4/3] flex items-center justify-center cursor-pointer group shadow-2xl" onclick="openFigureModal('${fig.id}')">
+                <img src="figures/${fig.filename}" alt="${fig.title}" class="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                  <span class="px-4 py-2 rounded-xl bg-brand-cyan/20 border border-brand-cyan/50 text-xs font-bold text-white flex items-center gap-2 shadow-2xl">
+                    <i data-lucide="maximize-2" class="w-4 h-4 text-brand-cyan"></i>
+                    Click to Inspect High-Res Visual
                   </span>
-                  <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition group-open:rotate-180 text-slate-400"></i>
-                </summary>
-                <div class="mt-2 space-y-2 pt-2 border-t border-white/5 text-[11px]">
-                  ${fig.faqs.map(faq => `
-                    <div class="p-2 rounded-lg bg-black/30 border border-white/5">
-                      <div class="font-bold text-white flex items-start gap-1">
-                        <span class="text-teal-400">Q:</span>
-                        <span>${faq.q}</span>
-                      </div>
-                      <div class="text-slate-300 mt-1 pl-4 leading-relaxed">${faq.a}</div>
-                    </div>
-                  `).join('')}
                 </div>
-              </details>
-            ` : ''}
-          </div>
+              </div>
 
-          <!-- Bottom Action CTA -->
-          <div class="pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-            <span class="text-slate-400 font-mono text-[11px]">${fig.filename}</span>
-            <button onclick="openFigureModal('${fig.id}')" class="px-3.5 py-1.5 rounded-lg bg-brand-cyan/15 hover:bg-brand-cyan/25 text-brand-cyan border border-brand-cyan/30 flex items-center gap-1.5 font-semibold transition active:scale-95">
-              <span>Full Study Dossier & FAQs</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
+              <!-- Subtitle / Caption -->
+              ${fig.subtitle ? `
+                <div class="p-3 rounded-xl bg-white/5 border border-white/5 text-[11.5px] text-brand-cyan/90 font-medium leading-snug">
+                  ${fig.subtitle}
+                </div>
+              ` : ''}
 
-        </div>
+              <!-- Visual Action Controls -->
+              <div class="flex items-center gap-2 pt-1">
+                <a href="figures/${fig.filename}" target="_blank" class="flex-1 py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-cyan"></i>
+                  <span>Open Raw File</span>
+                </a>
+                <button onclick="openFigureModal('${fig.id}')" class="flex-1 py-2 px-3 rounded-lg bg-brand-cyan/15 hover:bg-brand-cyan/25 text-brand-cyan border border-brand-cyan/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                  <span>Deep Dossier</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Complete Descriptions, Analysis & FAQs (7 cols) -->
+            <div class="lg:col-span-7 flex flex-col space-y-4">
+              
+              <!-- Title & Key Metrics -->
+              <div>
+                <h3 class="text-xl sm:text-2xl font-bold text-white tracking-tight leading-snug">${fig.title}</h3>
+                <p class="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">${fig.desc}</p>
+                
+                <!-- Topic Badges -->
+                ${fig.badges && fig.badges.length > 0 ? `
+                  <div class="flex flex-wrap gap-1.5 pt-3">
+                    ${fig.badges.map(b => `<span class="text-[10px] px-2.5 py-1 rounded bg-white/5 text-slate-300 font-mono border border-white/10">${b}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- Deep Breakdown Accordions -->
+              <div class="space-y-3 pt-2">
+                
+                <!-- What is this? -->
+                <details class="group bg-slate-950/50 rounded-xl p-3.5 border border-white/10 text-xs transition open:border-brand-cyan/30" open>
+                  <summary class="font-bold text-brand-cyan cursor-pointer flex justify-between items-center select-none">
+                    <span class="flex items-center gap-2">
+                      <i data-lucide="search" class="w-4 h-4 text-brand-cyan"></i>
+                      <span>What is this? (Visual Breakdown & Interpretation)</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition group-open:rotate-180 text-slate-400"></i>
+                  </summary>
+                  <div class="mt-3 text-slate-300 leading-relaxed pt-2.5 border-t border-white/5 text-xs font-sans">
+                    ${safeMarkdown(fig.what)}
+                  </div>
+                </details>
+
+                <!-- Why do we need it? -->
+                <details class="group bg-slate-950/50 rounded-xl p-3.5 border border-white/10 text-xs transition open:border-purple-500/30" open>
+                  <summary class="font-bold text-purple-300 cursor-pointer flex justify-between items-center select-none">
+                    <span class="flex items-center gap-2">
+                      <i data-lucide="lightbulb" class="w-4 h-4 text-purple-400"></i>
+                      <span>Why do we need it? (Rubric & Rationale)</span>
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 transition group-open:rotate-180 text-slate-400"></i>
+                  </summary>
+                  <div class="mt-3 text-slate-300 leading-relaxed pt-2.5 border-t border-white/5 text-xs font-sans">
+                    ${safeMarkdown(fig.why)}
+                  </div>
+                </details>
+
+                <!-- FAQs Accordion -->
+                ${fig.faqs && fig.faqs.length > 0 ? `
+                  <details class="group bg-slate-950/50 rounded-xl p-3.5 border border-white/10 text-xs transition open:border-teal-500/30">
+                    <summary class="font-bold text-teal-300 cursor-pointer flex justify-between items-center select-none">
+                      <span class="flex items-center gap-2">
+                        <i data-lucide="help-circle" class="w-4 h-4 text-teal-400"></i>
+                        <span>Frequently Asked Questions (${fig.faqs.length} Evaluator FAQs)</span>
+                      </span>
+                      <i data-lucide="chevron-down" class="w-4 h-4 transition group-open:rotate-180 text-slate-400"></i>
+                    </summary>
+                    <div class="mt-3 space-y-2.5 pt-2.5 border-t border-white/5 text-xs">
+                      ${fig.faqs.map(faq => `
+                        <div class="p-3 rounded-lg bg-black/40 border border-white/5">
+                          <div class="font-bold text-white flex items-start gap-1.5">
+                            <span class="text-teal-400 font-mono">Q:</span>
+                            <span>${faq.q}</span>
+                          </div>
+                          <div class="text-slate-300 mt-1.5 pl-4 text-[11.5px] leading-relaxed border-l border-teal-500/30">${faq.a}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </details>
+                ` : ''}
+
+              </div>
+
+            </div>
+
+          </div>
+        </article>
       `).join('');
-      lucide.createIcons();
+      
+      initSpotlightCards();
+      safeLucide();
     }
-    renderFigures();
 
     function openFigureModal(figId) {
       const fig = window.PROJECT_DATA && window.PROJECT_DATA.figures ? window.PROJECT_DATA.figures.find(f => f.id === figId) : null;
       if (!fig) return;
+
+      const modal = document.getElementById('image-modal');
+      if (!modal) return;
 
       document.getElementById('modal-img-src').src = `figures/${fig.filename}`;
       document.getElementById('modal-img-link').href = `figures/${fig.filename}`;
@@ -1208,137 +1309,53 @@
       document.getElementById('modal-category-badge').innerText = fig.category;
       document.getElementById('modal-filename-badge').innerText = fig.filename;
 
-      // Badges
       const badgesContainer = document.getElementById('modal-badges-container');
-      if (fig.badges && fig.badges.length > 0) {
-        badgesContainer.innerHTML = fig.badges.map(b => `
-          <span class="text-[10px] px-2.5 py-1 rounded-lg bg-white/5 text-brand-cyan border border-brand-cyan/20 font-mono">${b}</span>
-        `).join('');
-      } else {
-        badgesContainer.innerHTML = '';
+      if (badgesContainer) {
+        if (fig.badges && fig.badges.length > 0) {
+          badgesContainer.innerHTML = fig.badges.map(b => `
+            <span class="text-[10px] px-2.5 py-1 rounded-lg bg-white/5 text-brand-cyan border border-brand-cyan/20 font-mono">${b}</span>
+          `).join('');
+        } else {
+          badgesContainer.innerHTML = '';
+        }
       }
 
-      // Takeaways
-      document.getElementById('modal-takeaways-content').innerHTML = marked.parse(fig.takeaways || fig.desc);
+      document.getElementById('modal-takeaways-content').innerHTML = safeMarkdown(fig.takeaways || fig.desc);
+      document.getElementById('modal-what-content').innerHTML = safeMarkdown(fig.what || fig.desc);
+      document.getElementById('modal-why-content').innerHTML = safeMarkdown(fig.why || fig.desc);
 
-      // What is this?
-      document.getElementById('modal-what-content').innerHTML = marked.parse(fig.what || fig.desc);
-
-      // Why do we need it?
-      document.getElementById('modal-why-content').innerHTML = marked.parse(fig.why || fig.desc);
-
-      // FAQs Accordion
       const faqsContainer = document.getElementById('modal-faqs-container');
-      if (fig.faqs && fig.faqs.length > 0) {
-        faqsContainer.innerHTML = fig.faqs.map((faq, i) => `
-          <details class="group bg-white/5 rounded-xl p-3.5 border border-white/10 text-xs transition" name="figure-faq" ${i === 0 ? 'open' : ''}>
-            <summary class="font-bold text-teal-300 cursor-pointer flex justify-between items-center select-none">
-              <span class="flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-mono text-[10px]">Q</span>
-                <span>${faq.q}</span>
-              </span>
-              <i data-lucide="chevron-down" class="w-4 h-4 transition group-open:rotate-180 text-slate-400 shrink-0"></i>
-            </summary>
-            <div class="mt-3 text-slate-200 leading-relaxed pl-7 border-l-2 border-teal-500/40 text-[11.5px]">
-              ${faq.a}
-            </div>
-          </details>
-        `).join('');
-      } else {
-        faqsContainer.innerHTML = '<p class="text-xs text-slate-400">No additional FAQs registered for this visual.</p>';
+      if (faqsContainer) {
+        if (fig.faqs && fig.faqs.length > 0) {
+          faqsContainer.innerHTML = fig.faqs.map((faq, i) => `
+            <details class="group bg-white/5 rounded-xl p-3.5 border border-white/10 text-xs transition" name="figure-faq" ${i === 0 ? 'open' : ''}>
+              <summary class="font-bold text-teal-300 cursor-pointer flex justify-between items-center select-none">
+                <span class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-mono text-[10px]">Q</span>
+                  <span>${faq.q}</span>
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 transition group-open:rotate-180 text-slate-400 shrink-0"></i>
+              </summary>
+              <div class="mt-3 text-slate-200 leading-relaxed pl-7 border-l-2 border-teal-500/40 text-[11.5px]">
+                ${faq.a}
+              </div>
+            </details>
+          `).join('');
+        } else {
+          faqsContainer.innerHTML = '<p class="text-xs text-slate-400">No additional FAQs registered for this visual.</p>';
+        }
       }
 
-      document.getElementById('image-modal').showModal();
-      lucide.createIcons();
+      modal.showModal();
+      safeLucide();
     }
 
-    // 8. Repository & File Explorer Logic (51 Files)
+    // 7. Repository & File Explorer Logic (51 Files)
     let currentFile = null;
     let fileCategories = {};
 
-    function initFileExplorer() {
-      if (!window.PROJECT_DATA || !window.PROJECT_DATA.files) return;
-
-      fileCategories = {};
-      window.PROJECT_DATA.files.forEach(f => {
-        if (!fileCategories[f.category]) fileCategories[f.category] = [];
-        fileCategories[f.category].push(f);
-      });
-
-      renderFileTree();
-      
-      // Select report.md by default
-      const defaultFile = window.PROJECT_DATA.files.find(f => f.path === "report.md") || window.PROJECT_DATA.files[0];
-      if (defaultFile) selectFile(defaultFile.path);
-    }
-
-    function renderFileTree(filter = "") {
-      const container = document.getElementById('file-tree-container');
-      const q = filter.toLowerCase().trim();
-
-      let html = "";
-      for (const [category, files] of Object.entries(fileCategories)) {
-        const filtered = files.filter(f => f.path.toLowerCase().includes(q) || f.title.toLowerCase().includes(q));
-        if (filtered.length === 0) continue;
-
-        html += `
-          <div>
-            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between px-2">
-              <span>${category}</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-slate-400 font-mono">${filtered.length}</span>
-            </div>
-            <div class="space-y-1">
-              ${filtered.map(f => `
-                <button onclick="selectFile('${f.path}')" id="file-item-${f.path.replace(/[^a-zA-Z0-9]/g, '_')}" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-mono flex items-center justify-between transition ${currentFile && currentFile.path === f.path ? 'bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30' : 'text-slate-300 hover:bg-white/5'}">
-                  <span class="truncate pr-2">${f.path}</span>
-                  <span class="text-[10px] text-slate-400 uppercase font-sans">${f.extension}</span>
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-      container.innerHTML = html;
-      lucide.createIcons();
-    }
-
-    function filterFiles(val) {
-      renderFileTree(val);
-    }
-
-    function selectFile(filePath) {
-      const file = window.PROJECT_DATA.files.find(f => f.path === filePath);
-      if (!file) return;
-      currentFile = file;
-
-      document.querySelectorAll('#file-tree-container button').forEach(b => {
-        b.classList.remove('bg-brand-cyan/15', 'text-brand-cyan', 'border', 'border-brand-cyan/30');
-        b.classList.add('text-slate-300');
-      });
-      const activeBtn = document.getElementById(`file-item-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-brand-cyan/15', 'text-brand-cyan', 'border', 'border-brand-cyan/30');
-      }
-
-      document.getElementById('viewer-filename').innerHTML = `<i data-lucide="file-code" class="w-4 h-4"></i><span>${file.path}</span>`;
-      document.getElementById('viewer-filedesc').innerText = `${file.title} (${(file.size / 1024).toFixed(1)} KB)`;
-
-      const container = document.getElementById('viewer-content-container');
-
-      if (file.extension === 'md') {
-        container.innerHTML = `<div class="prose prose-invert max-w-none text-xs leading-relaxed font-sans">${marked.parse(file.content)}</div>`;
-      } else if (file.extension === 'csv') {
-        container.innerHTML = renderCsvAsTable(file.content);
-      } else if (file.extension === 'json') {
-        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code class="language-json">${escapeHtml(file.content)}</code></pre>`;
-        Prism.highlightAllUnder(container);
-      } else if (file.extension === 'py') {
-        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code class="language-python">${escapeHtml(file.content)}</code></pre>`;
-        Prism.highlightAllUnder(container);
-      } else {
-        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code>${escapeHtml(file.content)}</code></pre>`;
-      }
-      lucide.createIcons();
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function renderCsvAsTable(csvText) {
@@ -1367,19 +1384,106 @@
       `;
     }
 
-    function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    function selectFile(filePath) {
+      if (!window.PROJECT_DATA || !window.PROJECT_DATA.files) return;
+      const file = window.PROJECT_DATA.files.find(f => f.path === filePath);
+      if (!file) return;
+      currentFile = file;
+
+      document.querySelectorAll('#file-tree-container button').forEach(b => {
+        b.classList.remove('bg-brand-cyan/15', 'text-brand-cyan', 'border', 'border-brand-cyan/30');
+        b.classList.add('text-slate-300');
+      });
+      const activeBtn = document.getElementById(`file-item-${filePath.replace(/[^a-zA-Z0-9]/g, '_')}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-brand-cyan/15', 'text-brand-cyan', 'border', 'border-brand-cyan/30');
+      }
+
+      const fnEl = document.getElementById('viewer-filename');
+      if (fnEl) fnEl.innerHTML = `<i data-lucide="file-code" class="w-4 h-4"></i><span>${file.path}</span>`;
+      
+      const fdEl = document.getElementById('viewer-filedesc');
+      if (fdEl) fdEl.innerText = `${file.title} (${(file.size / 1024).toFixed(1)} KB)`;
+
+      const container = document.getElementById('viewer-content-container');
+      if (!container) return;
+
+      if (file.extension === 'md') {
+        container.innerHTML = `<div class="prose prose-invert max-w-none text-xs leading-relaxed font-sans">${safeMarkdown(file.content)}</div>`;
+      } else if (file.extension === 'csv') {
+        container.innerHTML = renderCsvAsTable(file.content);
+      } else if (file.extension === 'json') {
+        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code class="language-json">${escapeHtml(file.content)}</code></pre>`;
+        if (typeof Prism !== 'undefined' && Prism.highlightAllUnder) Prism.highlightAllUnder(container);
+      } else if (file.extension === 'py') {
+        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code class="language-python">${escapeHtml(file.content)}</code></pre>`;
+        if (typeof Prism !== 'undefined' && Prism.highlightAllUnder) Prism.highlightAllUnder(container);
+      } else {
+        container.innerHTML = `<pre class="p-3 bg-black/60 rounded-xl overflow-x-auto"><code>${escapeHtml(file.content)}</code></pre>`;
+      }
+      safeLucide();
+    }
+
+    function renderFileTree(filter = "") {
+      const container = document.getElementById('file-tree-container');
+      if (!container) return;
+      const q = filter.toLowerCase().trim();
+
+      let html = "";
+      for (const [category, files] of Object.entries(fileCategories)) {
+        const filtered = files.filter(f => f.path.toLowerCase().includes(q) || f.title.toLowerCase().includes(q));
+        if (filtered.length === 0) continue;
+
+        html += `
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between px-2">
+              <span>${category}</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-slate-400 font-mono">${filtered.length}</span>
+            </div>
+            <div class="space-y-1">
+              ${filtered.map(f => `
+                <button onclick="selectFile('${f.path}')" id="file-item-${f.path.replace(/[^a-zA-Z0-9]/g, '_')}" class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-mono flex items-center justify-between transition ${currentFile && currentFile.path === f.path ? 'bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30' : 'text-slate-300 hover:bg-white/5'}">
+                  <span class="truncate pr-2">${f.path}</span>
+                  <span class="text-[10px] text-slate-400 uppercase font-sans">${f.extension}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+      safeLucide();
+    }
+
+    function filterFiles(val) {
+      renderFileTree(val);
     }
 
     function copyCurrentFileContent() {
       if (!currentFile) return;
       navigator.clipboard.writeText(currentFile.content).then(() => {
         alert(`Copied ${currentFile.filename} to clipboard!`);
+      }).catch(err => {
+        console.warn('Clipboard write error:', err);
       });
     }
-    initFileExplorer();
 
-    // 9. Rubric Matrix Populator
+    function initFileExplorer() {
+      if (!window.PROJECT_DATA || !window.PROJECT_DATA.files || window.PROJECT_DATA.files.length === 0) return;
+
+      fileCategories = {};
+      window.PROJECT_DATA.files.forEach(f => {
+        if (!fileCategories[f.category]) fileCategories[f.category] = [];
+        fileCategories[f.category].push(f);
+      });
+
+      renderFileTree();
+      
+      const defaultFile = window.PROJECT_DATA.files.find(f => f.path === "report.md") || window.PROJECT_DATA.files[0];
+      if (defaultFile) selectFile(defaultFile.path);
+    }
+
+    // 8. Rubric Matrix Populator
     const RUBRIC_ITEMS = [
       { id: "G1", title: "Repo URL & Clean Tree", claim: "Self-contained repository with src/, tests/, results/", artifact: "Git root, .github/workflows/ci.yml", status: "PASS" },
       { id: "G2", title: "Single Problem Statement", claim: "Exclusively PS-O3 (0/1 Knapsack)", artifact: "README.md, report.md", status: "PASS" },
@@ -1399,6 +1503,7 @@
 
     function renderRubricTable() {
       const tbody = document.getElementById('rubric-table-body');
+      if (!tbody) return;
       tbody.innerHTML = RUBRIC_ITEMS.map(r => `
         <tr class="hover:bg-white/5">
           <td class="py-2.5 px-3 font-mono font-bold text-brand-cyan">${r.id}</td>
@@ -1407,15 +1512,16 @@
           <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold">${r.status}</span></td>
         </tr>
       `).join('');
+      safeLucide();
     }
-    renderRubricTable();
 
-    // 10. Pitch Teleprompter & Timer
+    // 9. Pitch Teleprompter & Timer
     let pitchSeconds = 180;
     let pitchTimer = null;
 
     function togglePitchTimer() {
       const btn = document.getElementById('pitch-timer-btn');
+      if (!btn) return;
       if (pitchTimer) {
         clearInterval(pitchTimer);
         pitchTimer = null;
@@ -1432,31 +1538,66 @@
         }, 1000);
         btn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
       }
-      lucide.createIcons();
+      safeLucide();
     }
 
     function resetPitchTimer() {
       if (pitchTimer) clearInterval(pitchTimer);
       pitchTimer = null;
       pitchSeconds = 180;
-      document.getElementById('pitch-timer-btn').innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
+      const btn = document.getElementById('pitch-timer-btn');
+      if (btn) btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
       updatePitchTimerDisplay();
-      lucide.createIcons();
+      safeLucide();
     }
 
     function updatePitchTimerDisplay() {
       const m = Math.floor(pitchSeconds / 60);
       const s = pitchSeconds % 60;
-      document.getElementById('pitch-timer-display').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      const disp = document.getElementById('pitch-timer-display');
+      if (disp) disp.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function loadPitchScript() {
       const file = window.PROJECT_DATA && window.PROJECT_DATA.files ? window.PROJECT_DATA.files.find(f => f.path === "PITCH_SCRIPT.md") : null;
-      if (file) {
-        document.getElementById('pitch-script-body').innerHTML = marked.parse(file.content);
+      const el = document.getElementById('pitch-script-body');
+      if (el && file) {
+        el.innerHTML = safeMarkdown(file.content);
       }
     }
-    loadPitchScript();
+
+    // 10. Master App Bootstrapper
+    function bootstrapApp() {
+      safeInit("Counters", initCounters);
+      safeInit("SimItems", renderSimItems);
+      safeInit("RubricTable", renderRubricTable);
+      safeInit("Figures", renderFigures);
+      safeInit("FileExplorer", initFileExplorer);
+      safeInit("PitchScript", loadPitchScript);
+      safeInit("Lucide", safeLucide);
+    }
+
+    // Run immediately, on DOM ready, and on window load
+    bootstrapApp();
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootstrapApp);
+    }
+    window.addEventListener('load', bootstrapApp);
+
+    // If PROJECT_DATA takes a moment to load from cache/disk, poll until ready
+    if (!window.PROJECT_DATA || !window.PROJECT_DATA.figures) {
+      let pollCount = 0;
+      const pollInterval = setInterval(() => {
+        pollCount++;
+        if (window.PROJECT_DATA && window.PROJECT_DATA.figures) {
+          clearInterval(pollInterval);
+          bootstrapApp();
+        } else if (pollCount > 40) {
+          clearInterval(pollInterval);
+        }
+      }, 50);
+    }
   </script>
 </body>
 </html>
