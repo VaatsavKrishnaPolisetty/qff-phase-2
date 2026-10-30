@@ -183,6 +183,26 @@ def analyze_qubit_scaling(output_csv: Path = None):
     print(f"Saved qubit scaling analysis to {output_csv}")
     return df
 
+
+
+def get_all_mission_case_studies():
+    """Returns the 5 canonical real-world mission domains mapped to PS-O3."""
+    json_path = Path(__file__).resolve().parent.parent / "data/mission_case_studies.json"
+    if json_path.exists():
+        import json
+        with open(json_path) as f:
+            return json.load(f)
+    return [
+        {
+            "id": "disaster_relief",
+            "title": "Autonomous Drone Emergency Disaster-Relief Cargo Loading",
+            "domain": "Humanitarian Aerospace Logistics",
+            "max_weight": 15, "weight_unit": "kg",
+            "max_volume": 10, "volume_unit": "L",
+            "items": DISASTER_RELIEF_ITEMS
+        }
+    ]
+
 if __name__ == "__main__":
     # 1. Official 5-item Disaster Relief validation
     vals = [item["value"] for item in DISASTER_RELIEF_ITEMS]

@@ -1,0 +1,327 @@
+[
+  {
+    "id": "disaster_relief",
+    "title": "Autonomous Drone Emergency Disaster-Relief Cargo Loading",
+    "domain": "Humanitarian Aerospace Logistics",
+    "description": "Rapid aerial humanitarian relief dispatch via autonomous quadcopter/VTOL drones to remote flood, landslide, and earthquake zones.",
+    "objective_desc": "Maximize human survival utility score under strict aerial lift limits.",
+    "max_weight": 15,
+    "weight_unit": "kg",
+    "max_volume": 10,
+    "volume_unit": "L",
+    "items": [
+      {
+        "id": 1,
+        "name": "Trauma & Surgical Medical Kit",
+        "value": 10,
+        "weight": 5,
+        "volume": 3,
+        "role": "Critical triage & hemorrhage control"
+      },
+      {
+        "id": 2,
+        "name": "Potable Water Purification Units",
+        "value": 4,
+        "weight": 3,
+        "volume": 4,
+        "role": "Pathogen filtration & oral rehydration"
+      },
+      {
+        "id": 3,
+        "name": "Emergency High-Calorie Rations",
+        "value": 7,
+        "weight": 4,
+        "volume": 2,
+        "role": "Survival sustenance for isolated families"
+      },
+      {
+        "id": 4,
+        "name": "Satellite Comms & Emergency Beacon",
+        "value": 5,
+        "weight": 2,
+        "volume": 1,
+        "role": "Search-and-rescue SOS telemetry"
+      },
+      {
+        "id": 5,
+        "name": "Portable Micro-Generator & Batteries",
+        "value": 8,
+        "weight": 6,
+        "volume": 5,
+        "role": "Recharge field medical hardware"
+      }
+    ],
+    "optimal_solution": {
+      "best_selection": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "best_value": 26,
+      "total_weight": 14,
+      "total_volume": 10
+    }
+  },
+  {
+    "id": "satellite_payload",
+    "title": "Low Earth Orbit (LEO) Satellite Instrument Slot Allocation",
+    "domain": "NewSpace Aerospace & Earth Observation",
+    "description": "Earth-observation CubeSat/SmallSat orbital payload allocation under strict launch mass budget and bus electrical power draw.",
+    "objective_desc": "Maximize scientific data return and commercial imaging value per orbit.",
+    "max_weight": 15,
+    "weight_unit": "kg (Launch Mass)",
+    "max_volume": 10,
+    "volume_unit": "W (Peak Bus Power)",
+    "items": [
+      {
+        "id": 1,
+        "name": "Multispectral Infrared Climate Imager",
+        "value": 10,
+        "weight": 5,
+        "volume": 3,
+        "role": "Wildfire and greenhouse gas monitoring"
+      },
+      {
+        "id": 2,
+        "name": "X-Band High-Speed Laser Downlink Transceiver",
+        "value": 4,
+        "weight": 3,
+        "volume": 4,
+        "role": "Gbps real-time ground telemetry"
+      },
+      {
+        "id": 3,
+        "name": "Synthetic Aperture Radar (SAR) Subsystem",
+        "value": 7,
+        "weight": 4,
+        "volume": 2,
+        "role": "All-weather day/night maritime reconnaissance"
+      },
+      {
+        "id": 4,
+        "name": "Autonomous Star Tracker & Attitude IMU",
+        "value": 5,
+        "weight": 2,
+        "volume": 1,
+        "role": "Sub-arcsecond orbital pointing"
+      },
+      {
+        "id": 5,
+        "name": "Deep Space Radiation Spectrometer",
+        "value": 8,
+        "weight": 6,
+        "volume": 5,
+        "role": "Solar flare particle telemetry"
+      }
+    ],
+    "optimal_solution": {
+      "best_selection": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "best_value": 26,
+      "total_weight": 14,
+      "total_volume": 10
+    }
+  },
+  {
+    "id": "clean_energy_microgrid",
+    "title": "Extreme Weather Clean Energy Microgrid Asset Dispatch",
+    "domain": "Renewable Smart Energy & Grid Resilience",
+    "description": "Fast-response islanded renewable microgrid storage and generation asset dispatch during peak grid strain and hurricane outages.",
+    "objective_desc": "Maximize critical load power delivery under thermal dissipation and bus line capacity constraints.",
+    "max_weight": 15,
+    "weight_unit": "MWh (Inverter Transfer Capacity)",
+    "max_volume": 10,
+    "volume_unit": "MW (Peak Ramp Rate)",
+    "items": [
+      {
+        "id": 1,
+        "name": "Hospital Critical Utility Battery Storage",
+        "value": 10,
+        "weight": 5,
+        "volume": 3,
+        "role": "Zero-dropout hospital and trauma center power"
+      },
+      {
+        "id": 2,
+        "name": "Municipal Water Pumping Station Feeder",
+        "value": 4,
+        "weight": 3,
+        "volume": 4,
+        "role": "Continuous potable water pressure"
+      },
+      {
+        "id": 3,
+        "name": "Community Micro-Cold-Storage for Vaccines",
+        "value": 7,
+        "weight": 4,
+        "volume": 2,
+        "role": "Perishable medicine temperature maintenance"
+      },
+      {
+        "id": 4,
+        "name": "Emergency Services Dispatch Command Radio",
+        "value": 5,
+        "weight": 2,
+        "volume": 1,
+        "role": "Police, fire, and emergency comms network"
+      },
+      {
+        "id": 5,
+        "name": "Industrial Cold-Start Biogas Generator",
+        "value": 8,
+        "weight": 6,
+        "volume": 5,
+        "role": "Baseload auxiliary generation"
+      }
+    ],
+    "optimal_solution": {
+      "best_selection": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "best_value": 26,
+      "total_weight": 14,
+      "total_volume": 10
+    }
+  },
+  {
+    "id": "financial_arbitrage",
+    "title": "Quantum High-Frequency Risk-Parity Liquidity Arbitrage",
+    "domain": "Quantitative Finance & Algorithmic Trading",
+    "description": "Ultra-low-latency portfolio balance under strict Value-at-Risk (VaR) regulatory margin limits and counterparty exposure envelopes.",
+    "objective_desc": "Maximize risk-adjusted alpha (Sharpe ratio) while strictly capping margin consumption.",
+    "max_weight": 15,
+    "weight_unit": "M$ (Capital Margin Limit)",
+    "max_volume": 10,
+    "volume_unit": "Bps (Vol Stress VaR)",
+    "items": [
+      {
+        "id": 1,
+        "name": "S&P 500 Statistical Volatility Arbitrage Basket",
+        "value": 10,
+        "weight": 5,
+        "volume": 3,
+        "role": "High-Sharpe market-neutral equity spread"
+      },
+      {
+        "id": 2,
+        "name": "Cross-Currency FX Basis Swap Spread",
+        "value": 4,
+        "weight": 3,
+        "volume": 4,
+        "role": "Zero-delta international yield parity"
+      },
+      {
+        "id": 3,
+        "name": "High-Yield Green Bond Liquidity Tranche",
+        "value": 7,
+        "weight": 4,
+        "volume": 2,
+        "role": "Fixed-income premium with collateral liquidity"
+      },
+      {
+        "id": 4,
+        "name": "Cryptographic Asset Flash Arbitrage Pool",
+        "value": 5,
+        "weight": 2,
+        "volume": 1,
+        "role": "Cross-exchange deterministic micro-spread"
+      },
+      {
+        "id": 5,
+        "name": "Commodity Supercycle Long Exposure Unit",
+        "value": 8,
+        "weight": 6,
+        "volume": 5,
+        "role": "Inflation hedge long position"
+      }
+    ],
+    "optimal_solution": {
+      "best_selection": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "best_value": 26,
+      "total_weight": 14,
+      "total_volume": 10
+    }
+  },
+  {
+    "id": "edge_ai_robotics",
+    "title": "Autonomous Mars Rover Edge AI Compute & Sensor Scheduling",
+    "domain": "Autonomous Robotics & Planetary Exploration",
+    "description": "Real-time edge neural network model & LiDAR sensor scheduling on an autonomous exploration rover under thermal Watt envelopes and battery discharge limits.",
+    "objective_desc": "Maximize scientific discovery exploration score per martian sol.",
+    "max_weight": 15,
+    "weight_unit": "W (Peak Power Envelope)",
+    "max_volume": 10,
+    "volume_unit": "GB (Flash Memory Buffer)",
+    "items": [
+      {
+        "id": 1,
+        "name": "Stereo V-SLAM Visual Navigation CNN",
+        "value": 10,
+        "weight": 5,
+        "volume": 3,
+        "role": "Hazard avoidance & real-time path planning"
+      },
+      {
+        "id": 2,
+        "name": "Raman Laser Spectrometer Inference Core",
+        "value": 4,
+        "weight": 3,
+        "volume": 4,
+        "role": "Biosignature & mineral organic screening"
+      },
+      {
+        "id": 3,
+        "name": "Sub-Surface Ground Penetrating Radar DSP",
+        "value": 7,
+        "weight": 4,
+        "volume": 2,
+        "role": "Permafrost water ice deposit mapping"
+      },
+      {
+        "id": 4,
+        "name": "Direct-to-Orbiter Ka-Band Telemetry Beamformer",
+        "value": 5,
+        "weight": 2,
+        "volume": 1,
+        "role": "Deep Space Network relay link"
+      },
+      {
+        "id": 5,
+        "name": "Rock Core Drill Micro-Seismic Analyzer",
+        "value": 8,
+        "weight": 6,
+        "volume": 5,
+        "role": "Sample cache acoustic integrity test"
+      }
+    ],
+    "optimal_solution": {
+      "best_selection": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "best_value": 26,
+      "total_weight": 14,
+      "total_volume": 10
+    }
+  }
+]

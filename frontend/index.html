@@ -545,14 +545,66 @@
         
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/5">
           <div>
-            <h2 class="text-2xl lg:text-3xl font-extrabold text-white">Interactive 0/1 Knapsack & QAOA Playground</h2>
-            <p class="text-slate-400 text-xs mt-1">Live calculation of item combinations, log-binary slack qubit states, quadratic penalty violation, and QUBO energy.</p>
+            <h2 class="text-2xl lg:text-3xl font-extrabold text-white">Quantum Optimization Mission Simulator</h2>
+            <p class="text-slate-400 text-xs mt-1">Multi-domain combinatorial evaluation of item selections, log-binary slack qubit telemetry, quadratic penalty violations, and QUBO energy.</p>
           </div>
           
-          <button onclick="setOptimalCombo()" class="px-4 py-2 rounded-xl text-xs font-bold text-black bg-gradient-to-r from-brand-cyan to-teal-400 hover:opacity-90 transition active:scale-95 flex items-center gap-2">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            <span>Load Ground-Truth Optimum (V*=26)</span>
-          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setOptimalCombo()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-black bg-gradient-to-r from-brand-cyan to-teal-400 hover:opacity-90 transition active:scale-95 flex items-center gap-1.5 shadow-lg">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Load Global Optimum (V*=26)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mission Domain Preset Selector -->
+        <div class="spotlight-card rounded-2xl p-5 border border-white/10 space-y-3 bg-slate-900/40">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-cyan flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4"></i>
+              <span>Select Real-World Mission Domain Benchmark:</span>
+            </span>
+            <span id="mission-domain-badge" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-brand-cyan/15 text-brand-cyan border border-brand-cyan/30">
+              Humanitarian Aerospace Logistics
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1" id="mission-presets-container">
+            <button onclick="switchMissionDomain('disaster_relief')" id="preset-btn-disaster_relief" class="mission-btn p-3 rounded-xl border text-left transition bg-brand-cyan/20 border-brand-cyan/40 text-white">
+              <div class="text-[10px] font-bold uppercase text-brand-cyan">Mission 1</div>
+              <div class="text-xs font-semibold mt-0.5 truncate">🚁 Disaster Cargo</div>
+              <div class="text-[10px] text-slate-400 mt-1">Drone relief triage</div>
+            </button>
+
+            <button onclick="switchMissionDomain('satellite_payload')" id="preset-btn-satellite_payload" class="mission-btn p-3 rounded-xl border text-left transition bg-white/5 border-white/10 text-slate-400 hover:text-white">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Mission 2</div>
+              <div class="text-xs font-semibold mt-0.5 truncate">🛰️ Satellite Slots</div>
+              <div class="text-[10px] text-slate-400 mt-1">CubeSat Earth sensor</div>
+            </button>
+
+            <button onclick="switchMissionDomain('clean_energy_microgrid')" id="preset-btn-clean_energy_microgrid" class="mission-btn p-3 rounded-xl border text-left transition bg-white/5 border-white/10 text-slate-400 hover:text-white">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Mission 3</div>
+              <div class="text-xs font-semibold mt-0.5 truncate">⚡ Grid Dispatch</div>
+              <div class="text-[10px] text-slate-400 mt-1">Extreme storm battery</div>
+            </button>
+
+            <button onclick="switchMissionDomain('financial_arbitrage')" id="preset-btn-financial_arbitrage" class="mission-btn p-3 rounded-xl border text-left transition bg-white/5 border-white/10 text-slate-400 hover:text-white">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Mission 4</div>
+              <div class="text-xs font-semibold mt-0.5 truncate">📈 Risk Arbitrage</div>
+              <div class="text-[10px] text-slate-400 mt-1">Quantum VaR liquidity</div>
+            </button>
+
+            <button onclick="switchMissionDomain('edge_ai_robotics')" id="preset-btn-edge_ai_robotics" class="mission-btn p-3 rounded-xl border text-left transition bg-white/5 border-white/10 text-slate-400 hover:text-white">
+              <div class="text-[10px] font-bold uppercase text-slate-400">Mission 5</div>
+              <div class="text-xs font-semibold mt-0.5 truncate">🤖 Mars Rover AI</div>
+              <div class="text-[10px] text-slate-400 mt-1">Edge inference watts</div>
+            </button>
+          </div>
+
+          <!-- Mission Narrative Banner -->
+          <div id="mission-narrative" class="p-3.5 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-300 leading-relaxed">
+            <strong class="text-white">Autonomous Drone Emergency Disaster-Relief Cargo Loading:</strong> Rapid aerial humanitarian relief dispatch via autonomous quadcopter/VTOL drones to remote flood, landslide, and earthquake zones under strict motor lift capacity ($W = 15$ kg) and aerodynamic cargo envelope ($V = 10$ L).
+          </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1043,25 +1095,142 @@
       });
     }
 
-    // 5. Interactive 0/1 Knapsack Simulator
-    const KNAPSACK_ITEMS = [
-      { id: 1, name: "Trauma & Surgical Medical Kit", value: 10, weight: 5, vol: 3, checked: true },
-      { id: 2, name: "Potable Water Purification Units", value: 4, weight: 3, vol: 4, checked: true },
-      { id: 3, name: "Emergency High-Calorie Rations", value: 7, weight: 4, vol: 2, checked: true },
-      { id: 4, name: "Satellite Comms & Emergency Beacon", value: 5, weight: 2, vol: 1, checked: true },
-      { id: 5, name: "Portable Micro-Generator & Batteries", value: 8, weight: 6, vol: 5, checked: false }
-    ];
+    // 5. Multi-Domain Mission Simulation Engine (5 Real-World Case Studies)
+    const MISSION_DATASETS = {
+      disaster_relief: {
+        title: "Autonomous Drone Emergency Disaster-Relief Cargo Loading",
+        domain: "Humanitarian Aerospace Logistics",
+        narrative: "<strong>Autonomous Drone Emergency Disaster-Relief Cargo Loading:</strong> Rapid aerial humanitarian relief dispatch via autonomous quadcopter/VTOL drones to remote flood, landslide, and earthquake zones under strict motor lift capacity ($W = 15$ kg) and aerodynamic cargo envelope ($V = 10$ L).",
+        weightUnit: "kg (Cargo Lift Limit)",
+        volumeUnit: "L (Cargo Bay Volume)",
+        maxWeight: 15,
+        maxVolume: 10,
+        items: [
+          { id: 1, name: "Trauma & Surgical Medical Kit", value: 10, weight: 5, vol: 3, role: "Critical triage & hemorrhage control", checked: true },
+          { id: 2, name: "Potable Water Purification Units", value: 4, weight: 3, vol: 4, role: "Pathogen filtration & oral rehydration", checked: true },
+          { id: 3, name: "Emergency High-Calorie Rations", value: 7, weight: 4, vol: 2, role: "Survival sustenance for isolated families", checked: true },
+          { id: 4, name: "Satellite Comms & Emergency Beacon", value: 5, weight: 2, vol: 1, role: "Search-and-rescue SOS telemetry", checked: true },
+          { id: 5, name: "Portable Micro-Generator & Batteries", value: 8, weight: 6, vol: 5, role: "Recharge field medical hardware", checked: false }
+        ]
+      },
+      satellite_payload: {
+        title: "Low Earth Orbit (LEO) Satellite Instrument Slot Allocation",
+        domain: "NewSpace Aerospace & Earth Observation",
+        narrative: "<strong>LEO Satellite Instrument Slot Allocation:</strong> CubeSat orbital payload allocation under strict launch mass margins ($W = 15$ kg) and electrical bus power draw envelope ($V = 10$ W) maximizing scientific data return.",
+        weightUnit: "kg (Launch Mass Margin)",
+        volumeUnit: "W (Peak Bus Power Draw)",
+        maxWeight: 15,
+        maxVolume: 10,
+        items: [
+          { id: 1, name: "Multispectral Infrared Climate Imager", value: 10, weight: 5, vol: 3, role: "Wildfire and greenhouse gas monitoring", checked: true },
+          { id: 2, name: "X-Band High-Speed Laser Downlink", value: 4, weight: 3, vol: 4, role: "Gbps real-time ground telemetry", checked: true },
+          { id: 3, name: "Synthetic Aperture Radar (SAR) Subsystem", value: 7, weight: 4, vol: 2, role: "All-weather day/night radar mapping", checked: true },
+          { id: 4, name: "Autonomous Star Tracker & IMU", value: 5, weight: 2, vol: 1, role: "Sub-arcsecond orbital pointing", checked: true },
+          { id: 5, name: "Deep Space Radiation Spectrometer", value: 8, weight: 6, vol: 5, role: "Solar flare space weather telemetry", checked: false }
+        ]
+      },
+      clean_energy_microgrid: {
+        title: "Extreme Weather Clean Energy Microgrid Asset Dispatch",
+        domain: "Renewable Smart Energy & Grid Resilience",
+        narrative: "<strong>Clean Energy Microgrid Asset Dispatch:</strong> Islanded renewable community microgrid storage prioritization during hurricane outages under battery reserve ($W = 15$ MWh) and inverter surge capacity ($V = 10$ MW).",
+        weightUnit: "MWh (Inverter Battery Reserve)",
+        volumeUnit: "MW (Surge Headroom)",
+        maxWeight: 15,
+        maxVolume: 10,
+        items: [
+          { id: 1, name: "Hospital Critical Utility Battery Feeder", value: 10, weight: 5, vol: 3, role: "Zero-dropout hospital and ICU power", checked: true },
+          { id: 2, name: "Municipal Water Pumping Station Feeder", value: 4, weight: 3, vol: 4, role: "Main line potable water pressure", checked: true },
+          { id: 3, name: "Community Vaccine Cold-Storage Unit", value: 7, weight: 4, vol: 2, role: "Perishable medicine refrigeration", checked: true },
+          { id: 4, name: "Emergency Services Command Radio Feeder", value: 5, weight: 2, vol: 1, role: "Police & rescue command center", checked: true },
+          { id: 5, name: "Auxiliary Cold-Start Biogas Generator", value: 8, weight: 6, vol: 5, role: "Baseload backup generation", checked: false }
+        ]
+      },
+      financial_arbitrage: {
+        title: "Quantum High-Frequency Risk-Parity Liquidity Arbitrage",
+        domain: "Quantitative Finance & Algorithmic Trading",
+        narrative: "<strong>Risk-Parity Liquidity Arbitrage:</strong> Ultra-low-latency discrete portfolio rebalancing under regulatory margin limits ($W = 15$ M$) and Value-at-Risk volatility stress envelope ($V = 10$ bps) maximizing Sharpe alpha.",
+        weightUnit: "M$ (Capital Margin Limit)",
+        volumeUnit: "bps (Stress Volatility VaR)",
+        maxWeight: 15,
+        maxVolume: 10,
+        items: [
+          { id: 1, name: "S&P 500 Volatility Arbitrage Basket", value: 10, weight: 5, vol: 3, role: "Market-neutral volatility skew arbitrage", checked: true },
+          { id: 2, name: "Cross-Currency FX Basis Swap Spread", value: 4, weight: 3, vol: 4, role: "Covered interest yield parity spread", checked: true },
+          { id: 3, name: "High-Yield Green Bond Liquidity Tranche", value: 7, weight: 4, vol: 2, role: "Fixed-income ESG carry tranche", checked: true },
+          { id: 4, name: "Cryptographic Asset Flash Arbitrage Pool", value: 5, weight: 2, vol: 1, role: "Cross-venue latency micro-arbitrage", checked: true },
+          { id: 5, name: "Commodity Supercycle Long Unit", value: 8, weight: 6, vol: 5, role: "Inflation hedge long position", checked: false }
+        ]
+      },
+      edge_ai_robotics: {
+        title: "Autonomous Mars Rover Edge AI Compute & Sensor Scheduling",
+        domain: "Autonomous Robotics & Planetary Exploration",
+        narrative: "<strong>Mars Rover Edge AI Scheduling:</strong> Autonomous rover perception and instrument inference under thermal power budgets ($W = 15$ W) and flash buffer limits ($V = 10$ GB) maximizing discovery yield.",
+        weightUnit: "W (Compute Power Budget)",
+        volumeUnit: "GB (Flash Buffer Allocation)",
+        maxWeight: 15,
+        maxVolume: 10,
+        items: [
+          { id: 1, name: "Stereo V-SLAM Visual Navigation CNN", value: 10, weight: 5, vol: 3, role: "Real-time autonomous hazard navigation", checked: true },
+          { id: 2, name: "Raman Laser Spectrometer Core", value: 4, weight: 3, vol: 4, role: "Biosignature & organic screening", checked: true },
+          { id: 3, name: "Subsurface Radar Dielectric DSP", value: 7, weight: 4, vol: 2, role: "Permafrost ice layer mapping", checked: true },
+          { id: 4, name: "Deep Space Phased Array Beamformer", value: 5, weight: 2, vol: 1, role: "Orbiter relay telemetry link", checked: true },
+          { id: 5, name: "Drill Micro-Seismic Structural Classifier", value: 8, weight: 6, vol: 5, role: "Sample cache integrity test", checked: false }
+        ]
+      }
+    };
+
+    let currentMissionKey = 'disaster_relief';
+    let KNAPSACK_ITEMS = MISSION_DATASETS[currentMissionKey].items;
+
+    function switchMissionDomain(domainKey) {
+      if (!MISSION_DATASETS[domainKey]) return;
+      currentMissionKey = domainKey;
+      const data = MISSION_DATASETS[domainKey];
+      KNAPSACK_ITEMS = data.items;
+
+      // Update button styles
+      document.querySelectorAll('.mission-btn').forEach(btn => {
+        btn.className = "mission-btn p-3 rounded-xl border text-left transition bg-white/5 border-white/10 text-slate-400 hover:text-white";
+        const topEl = btn.querySelector('div:first-child');
+        if (topEl) topEl.className = "text-[10px] font-bold uppercase text-slate-400";
+      });
+      const activeBtn = document.getElementById(`preset-btn-${domainKey}`);
+      if (activeBtn) {
+        activeBtn.className = "mission-btn p-3 rounded-xl border text-left transition bg-brand-cyan/20 border-brand-cyan/40 text-white shadow-lg";
+        const topEl = activeBtn.querySelector('div:first-child');
+        if (topEl) topEl.className = "text-[10px] font-bold uppercase text-brand-cyan";
+      }
+
+      // Update narrative & badges
+      const narrativeEl = document.getElementById('mission-narrative');
+      if (narrativeEl) narrativeEl.innerHTML = data.narrative;
+      
+      const badgeEl = document.getElementById('mission-domain-badge');
+      if (badgeEl) badgeEl.innerText = data.domain;
+
+      renderSimItems();
+    }
+
+    function setOptimalCombo() {
+      KNAPSACK_ITEMS.forEach((it, idx) => {
+        it.checked = (idx < 4); // Items 0, 1, 2, 3 checked; item 4 unchecked
+      });
+      renderSimItems();
+    }
 
     function renderSimItems() {
       const container = document.getElementById('items-container');
       if (!container) return;
+      const mission = MISSION_DATASETS[currentMissionKey] || MISSION_DATASETS.disaster_relief;
+
       container.innerHTML = KNAPSACK_ITEMS.map((item, idx) => `
-        <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition ${item.checked ? 'border-brand-cyan/20 bg-slate-900/60' : ''}">
           <div class="flex items-center gap-3">
             <input type="checkbox" id="item-${idx}" ${item.checked ? 'checked' : ''} onchange="toggleItem(${idx})" class="w-4 h-4 rounded text-brand-cyan bg-white/10 border-white/20 focus:ring-brand-cyan cursor-pointer">
             <div>
               <label for="item-${idx}" class="text-xs font-semibold text-white cursor-pointer select-none">${item.name}</label>
-              <div class="text-[11px] text-slate-400 font-mono">Weight: ${item.weight} kg | Value: ${item.value} pts</div>
+              <div class="text-[11px] text-brand-cyan/90 font-medium">${item.role || ''}</div>
+              <div class="text-[10px] text-slate-400 font-mono mt-0.5">Primary: ${item.weight} | Secondary: ${item.vol || 0} | Utility: ${item.value} pts</div>
             </div>
           </div>
           <span class="text-xs font-bold font-mono text-brand-cyan">x_${idx}</span>
