@@ -7,6 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
 [![Team](https://img.shields.io/badge/Team-Emerging%20Genius-00f2fe.svg)](#)
 [![Track](https://img.shields.io/badge/Problem%20Statement-PS--O3-8b5cf6.svg)](#)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/VaatsavKrishnaPolisetty/qff-phase-2/blob/main/main.ipynb)
 
 **Team:** Emerging Genius  |  **Problem Statement:** PS-O3 (0/1 Knapsack exclusively)  |  **Repository:** [github.com/VaatsavKrishnaPolisetty/qff-phase-2](https://github.com/VaatsavKrishnaPolisetty/qff-phase-2)
 
