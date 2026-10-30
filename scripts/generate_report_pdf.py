@@ -297,3 +297,4 @@ __HTML_BODY__
 
 if __name__ == "__main__":
     build_pdf_report()
+

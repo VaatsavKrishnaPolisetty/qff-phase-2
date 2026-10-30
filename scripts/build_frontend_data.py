@@ -121,7 +121,7 @@ def build_data():
                 "• Processor D achieves **102 CX gates** (saving 19 CX gates vs Processor B).\n"
                 "• Circuit depth reduced from **117 to 87** (a 25.6% reduction).\n"
                 "• SWAP gate count dropped from **17 down to 10** (a 41.2% reduction).\n"
-                "• Mean graph distance reduced from $1.89$ to $1.50$, and graph diameter halved from 4 to 2."
+                "• Mean graph distance reduced from $1.94$ on B to $1.50$ on D, and graph diameter halved from 4 to 2."
             ),
             "faqs": [
                 {
@@ -244,12 +244,12 @@ def build_data():
             "why": (
                 "**Capacity Limits & Bottleneck Analysis:**\n"
                 "- **Capacity Limit on Processor A:** The 0/1 knapsack problem requires 5 decision qubits + 4 slack qubits = 9 qubits. Processor A has only 5 qubits and **cannot physically execute the problem** without altering the locked mathematical formulation.\n"
-                "- **Routing Bottlenecks on Processor B:** Graph diameter is 4 and average shortest path is $1.89$. When qubit $0$ needs to interact with qubit $3$ or $4$, the compiler must insert up to 3 intermediate SWAP gates, expanding the circuit to 121 CX gates.\n"
+                "- **Routing Bottlenecks on Processor B:** Graph diameter is 4 and average shortest path is $1.94$. When qubit $0$ needs to interact with qubit $3$ or $4$, the compiler must insert up to 3 intermediate SWAP gates, expanding the circuit to 121 CX gates.\n"
                 "- **Direct Shortcuts on Processor D:** Every qubit connects to 4 neighbors (degrees $i\\pm 1$ and $i\\pm 2$). The maximum distance between any two qubits is 2 hops, cutting SWAPs by 41.2%."
             ),
             "takeaways": (
                 "• Processor A: 5 qubits, 4 edges $\\implies$ Status: **Not Executable (Capacity Rule)**.\n"
-                "• Processor B: 9 qubits, 12 edges, diameter 4, avg path 1.89 $\\implies$ 17 SWAPs, 121 CX.\n"
+                "• Processor B: 9 qubits, 12 edges, diameter 4, avg path 1.94 $\\implies$ 17 SWAPs, 121 CX.\n"
                 "• Processor D: 9 qubits, 18 edges, diameter 2, avg path 1.50 $\\implies$ 10 SWAPs, 102 CX."
             ),
             "faqs": [

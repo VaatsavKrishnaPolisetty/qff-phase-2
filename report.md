@@ -17,7 +17,7 @@ The locked knapsack instance consists of 5 items with values $v = [10, 4, 7, 5, 
 The mapped 9-qubit Ising Hamiltonian contains 36 all-to-all $ZZ$ two-qubit interaction terms. We evaluate QAOA at depth $p=1$ across 5 official pseudorandom seeds ($0 \dots 4$) with classical COBYLA parameter optimization. We benchmark performance across three architectures:
 1. **Processor A (5 qubits):** Evaluated as strictly **not executable** under the official capacity rule (needs 9 qubits, has 5).
 2. **Processor B (9 qubits, 12 edges):** Reference benchmark exhibiting significant routing congestion (17 SWAPs, 121 CX gates, depth 117).
-3. **Processor D (9 qubits, 18 edges):** Our custom 4-regular circulant design $C_9(1, 2)$ which slashes routing overhead by $41.2\%$ (10 SWAPs, 102 CX gates, depth 87).
+3. **Processor D (9 qubits, 18 edges):** Our custom 4-regular circulant design $C_9(1, 2)$ which slashes SWAP routing overhead by $41.2\%$ (10 SWAPs vs. 17 on B, reducing physical CX from 121 to 102, depth from 117 to 87).
 
 Under the official depolarizing and readout noise model, QAOA achieves a feasible sampling probability of $P_{\text{feasible}} = 94.21\%$ on Processor D ($94.34\%$ on Processor B), decisively exceeding the uniform random baseline of $87.50\%$. The optimal item combination is sampled with probability $P_{\text{opt}} = 0.0225$ ($0.0249$ on B), reaching $100.0\%$ of the optimal value across 4096 shots.
 
@@ -63,11 +63,11 @@ Since $y_i^2 = y_i$ for binary variables:
 
 #### Explicit $9 \times 9$ Integer QUBO Matrix:
 $$\begin{pmatrix}
--725 & 150 & 200 & 100 & 300 & 50 & 100 & 200 & 400 \\
-0 & -441 & 120 & 60 & 180 & 30 & 60 & 120 & 240 \\
-0 & 0 & -573 & 80 & 240 & 40 & 80 & 160 & 320 \\
-0 & 0 & 0 & -295 & 120 & 20 & 40 & 80 & 160 \\
-0 & 0 & 0 & 0 & -872 & 60 & 120 & 240 & 480 \\
+-635 & 150 & 200 & 100 & 300 & 50 & 100 & 200 & 400 \\
+0 & -409 & 120 & 60 & 180 & 30 & 60 & 120 & 240 \\
+0 & 0 & -527 & 80 & 240 & 40 & 80 & 160 & 320 \\
+0 & 0 & 0 & -285 & 120 & 20 & 40 & 80 & 160 \\
+0 & 0 & 0 & 0 & -728 & 60 & 120 & 240 & 480 \\
 0 & 0 & 0 & 0 & 0 & -145 & 20 & 40 & 80 \\
 0 & 0 & 0 & 0 & 0 & 0 & -280 & 80 & 160 \\
 0 & 0 & 0 & 0 & 0 & 0 & 0 & -520 & 320 \\
@@ -80,9 +80,10 @@ $$\begin{pmatrix}
 Using the spin transformation $y_i = \frac{I - Z_i}{2}$, the QUBO maps onto the Ising Hamiltonian:
 $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i < j \le 8} J_{ij} Z_i Z_j + \text{offset}$$
 
-- **Two-qubit coupling terms:** $\binom{9}{2} = 36$ non-zero $ZZ$ terms (dense, all-to-all connectivity).
+- **Two-qubit coupling terms:** $\binom{9}{2} = 36$ non-zero $ZZ$ terms (dense, all-to-all connectivity; 10 item-item and 26 slack-involved couplings).
 - **Single-qubit terms:** 9 non-zero $Z$ terms.
-- **Energy offset:** $14.5$
+- **Energy offset:** $233.0$ (equals the unpolarized mean cost over all $2^9 = 512$ basis states).
+- **Ising Scaling Factor:** $\text{scale} = 120.0$ (maximum coefficient magnitude).
 
 ### 1.5 Real-World Mission Contexts & Industrial Impact
 
@@ -192,16 +193,21 @@ The measurements were performed on two physical pairs:
 1. **Adjacent Pair $(0, 1)$:** Distance 1 in the coupling graph. Transpiled circuit depth = 2, CX count = 1.
 2. **Farthest Pair $(0, 3)$:** Distance 2 in the coupling graph. Transpiled circuit depth = 7, CX count = 4 (requires 1 inserted SWAP gate).
 
-| Pair Type | Physical Pair | Distance | Condition | CX Count | $\langle XX \rangle \pm \text{SE}$ | $\langle YY \rangle \pm \text{SE}$ | $\langle ZZ \rangle \pm \text{SE}$ | Fidelity $F \pm \text{SE}$ |
-|---|---|---|---|---|---|---|---|---|
-| **Adjacent** | $(0, 1)$ | 1 | **Ideal** | 1 | $1.0000 \pm 0.0000$ | $-1.0000 \pm 0.0000$ | $1.0000 \pm 0.0000$ | **$1.0000 \pm 0.0000$** |
-| **Adjacent** | $(0, 1)$ | 1 | **Noisy** | 1 | $0.9458 \pm 0.0051$ | $-0.9521 \pm 0.0048$ | $0.9551 \pm 0.0046$ | **$0.9633 \pm 0.0021$** |
-| **Farthest** | $(0, 3)$ | 2 | **Ideal** | 4 | $1.0000 \pm 0.0000$ | $-1.0000 \pm 0.0000$ | $1.0000 \pm 0.0000$ | **$1.0000 \pm 0.0000$** |
-| **Farthest** | $(0, 3)$ | 2 | **Noisy** | 4 | $0.9448 \pm 0.0051$ | $-0.9360 \pm 0.0055$ | $0.9385 \pm 0.0054$ | **$0.9548 \pm 0.0023$** |
+##### Table 2.2A: Bell State Verification on Processor D (Noiseless Baseline)
+| Physical Pair | Graph Distance | Circuit Depth | CX Count | $\langle XX \rangle$ | $\langle YY \rangle$ | $\langle ZZ \rangle$ | State Fidelity $F \pm \sigma_F$ |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Adjacent $(0, 1)$** | 1 | 2 | 1 | $1.0000$ | $-1.0000$ | $1.0000$ | **$1.0000 \pm 0.0000$** |
+| **Farthest $(0, 3)$** | 2 | 7 | 4 | $1.0000$ | $-1.0000$ | $1.0000$ | **$1.0000 \pm 0.0000$** |
+
+##### Table 2.2B: Bell State Verification on Processor D Under Official Noise ($p_1=0.001, p_2=0.005, p_{\text{readout}}=0.01$)
+| Physical Pair | Graph Distance | CX Count | $\langle XX \rangle \pm \sigma$ | $\langle YY \rangle \pm \sigma$ | $\langle ZZ \rangle \pm \sigma$ | Measured Fidelity $F \pm \sigma_F$ |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Adjacent $(0, 1)$** | 1 | 1 | $0.9458 \pm 0.0051$ | $-0.9521 \pm 0.0048$ | $0.9551 \pm 0.0046$ | **$0.9633 \pm 0.0021$** |
+| **Farthest $(0, 3)$** | 2 | 4 | $0.9448 \pm 0.0051$ | $-0.9360 \pm 0.0055$ | $0.9385 \pm 0.0054$ | **$0.9548 \pm 0.0023$** |
 
 ### 2.3 Physical Interpretation
 - **Ideal Performance:** Under noiseless conditions, both adjacent and non-adjacent pairs exhibit perfect correlation ($\langle XX \rangle = 1.0$, $\langle YY \rangle = -1.0$, $\langle ZZ \rangle = 1.0$), confirming $F = 1.0000 \pm 0.0000$.
-- **Adjacent Noisy Degradation:** For the adjacent pair $(0, 1)$, fidelity drops from $1.0000$ to $0.9633 \pm 0.0021$. This degradation is driven by three noise sources: two-qubit depolarizing error on the single CX gate ($p_2 = 0.005$), single-qubit gate errors ($p_1 = 0.001$), and symmetric readout bitflip noise ($p_{\text{readout}} = 0.01$ per qubit). Readout noise alone inverts bit parity with probability $\approx 2 p_{\text{readout}} = 0.02$, establishing an upper bound of $\approx 0.98$ on raw measured fidelity even before gate noise.
+- **Adjacent Noisy Degradation:** For the adjacent pair $(0, 1)$, fidelity drops from $1.0000$ to $0.9633 \pm 0.0021$. This degradation is driven by three noise sources: two-qubit depolarizing error on the single CX gate ($p_2 = 0.005$), single-qubit gate errors ($p_1 = 0.001$), and symmetric readout bitflip noise ($p_{\text{readout}} = 0.01$ per qubit). Readout noise alone caps raw measured Bell state fidelity at approximately $0.970$ (rather than $1.0$), even before accounting for CX gate noise.
 - **Farthest Pair Penalty:** For the farthest pair $(0, 3)$, physical distance 2 requires SABRE routing to insert a SWAP gate, which decomposes into 3 additional CX gates, quadrupling the CX count from 1 to 4. Each additional CX gate introduces two-qubit depolarizing noise ($p_2 = 0.005$), depressing $\langle YY \rangle$ from $-0.9521$ to $-0.9360$ and $\langle ZZ \rangle$ from $0.9551$ to $0.9385$. Consequently, the noisy fidelity suffers a statistically significant decline to $F = 0.9548 \pm 0.0023$.
 
 ---
@@ -246,6 +252,9 @@ We deliberately chose `circulant_n9_o1-2` based on an engineering trade-off rath
 2. **Vertex-Transitive Structural Symmetry:** Unlike random graphs (`rand4reg_n10_s4`) which have irregular connectivity and non-uniform shortest-path distributions, the circulant chordal graph has an automorphism group of order 18. All 9 qubits are geometrically and topologically equivalent, ensuring that routing overhead does not depend sensitively on initial qubit placement or localized calibration defects.
 3. **Hardware Yield:** Restricting qubit count to exactly $N=9$ avoids fabricating 10 to 12 qubits, minimizing chip area and transmon collision hazards while operating at the maximum allowed degree of 4.
 
+> [!NOTE]
+> **Frontier Scope & Problem-Aware Topology Distinction:** The Pareto frontier evaluated here in Figure 3.2 investigates **general-purpose, instance-agnostic candidate topologies** (regular rings, grids, circulants, and random 4-regular graphs). In Section 6.4, we develop an instance-tailored **Problem-Aware Processor D** (17 edges, 90 CX, depth 78) whose edges directly prioritize the strongest $|J_{ij}|$ couplings of this specific knapsack matrix. Because problem-aware D is specialized to this single Hamiltonian rather than acting as a general-purpose processor, it is analyzed separately as an algorithmic co-design study.
+
 The candidate dataset is archived at [`results/extra/pareto_candidates.csv`](file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/extra/pareto_candidates.csv).
 
 ### 3.3 Pre-Execution Theoretical Prediction vs. Post-Execution Measured Outcome
@@ -253,7 +262,7 @@ In accordance with rubric requirements, we pre-documented our analytical archite
 
 - **Theoretical Prediction (Formulated Pre-Run):**
   The 9-qubit Knapsack cost Hamiltonian contains $\binom{9}{2} = 36$ dense two-qubit interactions.
-  - On Processor B, the graph diameter is 4 and average shortest-path distance is $\bar{d}_B = 1.89$, causing frequent 3-hop routing cascades.
+  - On Processor B, the graph diameter is 4 and average shortest-path distance is $\bar{d}_B = 1.94$, causing frequent 3-hop routing cascades.
   - On Processor D, the degree-4 circulant chords reduce graph diameter to 2 and average distance to $\bar{d}_D = 1.50$, ensuring every node can reach any other in at most 2 hops.
   - *Analytical SWAP Expectation:* Moving from diameter 4 to diameter 2 across 36 dense pairs is analytically expected to eliminate **$\approx 6$ to $8$ SWAP gates** ($\approx 18$ to $24$ CX gates) and decrease two-qubit depth by $\approx 20\text{–}30\%$.
   - *Noise Survival Expectation:* Under depolarizing noise with $p_2 = 0.005$ per CX gate, eliminating $\sim 20$ CX gates predicts a two-qubit state survival improvement factor of $\approx (1 - 0.005)^{-20} \approx +10.5\%$, translating to lower sampled energy $\langle C_{\text{noisy}} \rangle$.
@@ -329,10 +338,9 @@ Five pseudorandom starting angles were drawn according to the official protocol 
 | **4** | 2.9627 | 1.6064 | 4.0598 | 1.5992 | -0.0007 | 67 | 0.8751 | 0.0311 |
 
 ### 5.2 Landscape Topography & Noise Flattening
-- **Global Optimum Location:** The COBYLA optimizer converged from Seed 1 to the global minimum at $\gamma^* = 0.2831, \beta^* = 2.8648$ with expectation $\langle C_{\text{scaled}} \rangle = -1.5232$. This directly matches the noisy sampled landscape grid, where the empirical grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.
+- **Global vs. Local Minima and Plateau Stalling:** Seed 1 converged from $\gamma_0 = 1.6079, \beta_0 = 2.9860$ to the global minimum at $\gamma^* = 0.2831, \beta^* = 2.8648$ with expectation $\langle C_{\text{scaled}} \rangle = -1.5232$ (directly matching the noisy sampled grid minimum of $78.36$ at $\gamma = 0.263, \beta = 2.811$). Seed 3 descended into a distinct, weaker local minimum ($\gamma^* = 0.2844, \beta^* = 1.3544, \langle C_{\text{scaled}} \rangle = -0.8535$). The remaining seeds (0, 2, and 4) stalled on the flat, highly corrugated plateau ($\langle C_{\text{scaled}} \rangle \approx -0.0081, -0.0057, -0.0007$), where the gradient-free COBYLA optimizer became trapped in negligible local ripples.
 - **Narrowness of the Convergence Valley:** The landscape reveals a steep, narrow ravine confined to $\gamma \in [0.20, 0.35]$. For $\gamma > 0.40$, the dense interference of 36 non-commuting $ZZ$ rotations creates a chaotic, oscillatory plateau.
-- **Why Seeds 0, 2, and 4 Failed:** Seeds 0, 2, and 4 initialized at $\gamma_0 \gg 0.40$. Landing in the flat, highly corrugated plateau, the gradient-free COBYLA optimizer became trapped in negligible local ripples, yielding expectations near zero ($-0.0081, -0.0057, -0.0007$) and feasibility rates indistinguishable from uniform random guessing ($87.3\% - 87.6\%$). Only seeds initialized near or below the valley (Seeds 1 and 3) descended into the true minimum.
-- **Noise Attenuation:** Depolarizing and readout noise contract the dynamic range of the landscape and lift the mean grid cost to $322.03$ (well above the random baseline cost of $233.0$), smoothing the steep valley walls.
+- **Noise Attenuation & Mean Pull:** Depolarizing and readout noise contract the dynamic range of the landscape toward the unpolarized random-state mean cost of $233.0$. Across the $20 \times 20$ grid, noise lifts the minimum energy from the ideal value of $56.19$ up to $78.36$, while pulling the overall grid mean down from the noiseless mean of $383.41$ toward $233.0$ (reaching $322.03$).
 
 ---
 
@@ -345,16 +353,16 @@ Five pseudorandom starting angles were drawn according to the official protocol 
 4. **Synthetic Noise Model:** The official noise model applies uniform depolarizing and bit-flip errors. It does not account for coherent phase over-rotations, amplitude damping ($T_1$), dephasing ($T_2$), or non-uniform edge calibration found on physical transmon devices.
 
 ### 6.2 Three Concrete Evidence-Based Improvements
-1. **Shifted-Target Quadratic Penalty (Slack Elimination):**
-   *Method:* Replace the 4 binary slack qubits with a shifted-target quadratic penalty applied directly to the 5 item variables, targeting $W_{\text{eff}} = 14$ (the optimal feasible weight) instead of $W = 15$:
+1. **Shifted-Target Quadratic Penalty (Answer-Key Informed Heuristic):**
+   *Method:* As an analytical benchmark for slack elimination, we evaluated replacing the 4 binary slack qubits with a shifted-target quadratic penalty on the 5 item variables, setting the penalty target to the known optimal weight $W_{\text{eff}} = 14$:
    $$P_{\text{shifted}}(x) = P \left(\sum w_i x_i - W_{\text{eff}}\right)^2$$
-   *Evidence:* Eliminating the 4 slack qubits reduces the problem from 9 qubits to 5 qubits and drops $ZZ$ interactions from 36 to 10. This reduces circuit depth by $>60\%$ and allows the problem to execute on compact 5-qubit processors like Processor A.
+   *Status & Caveat:* We emphasize that this is a **problem-informed heuristic that uses the answer key** ($W_{\text{eff}} = 14$) to demonstrate the theoretical upper bound of slack elimination (reducing qubits from 9 to 5, $ZZ$ terms from 36 to 10, depth by $>60\%$, and allowing execution on Processor A). It is not presented as an unassisted general solver, because finding $W_{\text{eff}}$ in an unknown instance requires solving the knapsack problem.
 
 ![Shifted-Target vs Slack Comparison](results/figures/shifted_target_vs_slack.png)
 
 2. **Multi-Angle QAOA (ma-QAOA) and $p \ge 2$ Layering:**
    *Method:* Assign distinct variational parameters $\gamma_{ij}$ to each Hamiltonian edge and $\beta_i$ to each qubit, or increase depth to $p=2$.
-   *Evidence:* The classical seed sweep proved that global $(\gamma, \beta)$ parameters cannot selectively amplify the optimal subset $[1, 2, 3, 4]$ over safe interior subsets like $[1, 3]$. Multi-angle QAOA provides the necessary degrees of freedom to bias amplitudes toward the capacity boundary.
+   *Evidence:* The classical seed sweep proved that the cost-minimizing $(\gamma, \beta)$ angles do not amplify the optimal subset $[1, 2, 3, 4]$ beyond random chance (yielding $P_{\text{opt}} \approx 0.0226$ vs. $0.03125$ baseline), because standard expectation minimization concentrates probability on safe, high-entropy interior states like $[1, 3]$ rather than the boundary optimum. Multi-angle QAOA provides the necessary parameter freedom to steer probability toward the capacity boundary.
 3. **Dynamical Decoupling (DD) & Zero-Noise Extrapolation (ZNE):**
    *Method:* Insert $XY4$ or CPMG dynamical decoupling pulse sequences on idle qubits during routing SWAP delays, combined with digital unitary folding to extrapolate to the zero-noise limit.
    *Evidence:* In the Bell experiment, adding 3 CX gates for a distant pair reduced state fidelity by $0.85$ percentage points. In QAOA, noise raised the mean QUBO cost by $26.09$ units on Processor D. Active error mitigation directly suppresses this depth-dependent depolarizing degradation.
@@ -366,18 +374,18 @@ Five pseudorandom starting angles were drawn according to the official protocol 
 
 ![Warm-Started QAOA Comparison](results/figures/warm_start_comparison.png)
 
-2. **Realistic IBM Quantum Hardware Calibration Noise:**
-   Moving beyond synthetic uniform noise, we instantiated a 9-qubit superconducting transmon digital twin (`GenericBackendV2`) mimicking physical IBM Quantum QPUs. The model integrates non-uniform thermal relaxation ($T_1 \in [122.7, 182.8] \ \mu\text{s}$), dephasing times ($T_2 \in [109.4, 197.1] \ \mu\text{s}$), non-uniform readout error matrices, and cross-resonance CX durations. On this physical digital twin, the Processor D compiled circuit achieved **$96.29\%$ feasibility** and captured the optimum $V^*=26$, validating noise resilience on actual transmon hardware.
+2. **Realistic Simulated IBM Quantum Calibration Noise:**
+   Moving beyond synthetic uniform noise, we instantiated a 9-qubit superconducting transmon simulated digital twin (`GenericBackendV2`) mimicking IBM Quantum calibration profiles. The model integrates non-uniform thermal relaxation ($T_1 \in [122.7, 182.8] \ \mu\text{s}$), dephasing times ($T_2 \in [109.4, 197.1] \ \mu\text{s}$), non-uniform readout error matrices, and cross-resonance CX durations. On this simulated transmon backend, the Processor D compiled circuit achieved **$96.29\%$ feasibility** and captured the optimum $V^*=26$, confirming simulated noise resilience under realistic transmon device parameters (noting that Processor D's 4-regular circulant topology is simulated here rather than a native physical IBM heavy-hex layout).
 
 3. **OpenQASM 3.0 Production Export & Pulse Timing Analysis:**
-   The fully transpiled Processor D circuit was exported to IEEE standard OpenQASM 3.0 format (`results/extra/processor_D_circuit.qasm`, 3300 bytes) ready for immediate submission to the IBM Quantum Cloud API. A nanosecond pulse duration analysis based on fixed-frequency transmons revealed that our 81 $R_Z$ gates execute in **0 ns** via virtual Z frame changes, 27 $S_X$ pulses take **$35.55$ ns** each, and 102 CX cross-resonance gates take **$250.0$ ns** each. The total critical path execution latency is **$16.45 \ \mu\text{s}$**—comfortably below the physical $T_1/T_2$ coherence threshold ($\sim 150 \ \mu\text{s}$), confirming hardware executability.
+   The fully transpiled Processor D circuit was exported to IEEE standard OpenQASM 3.0 format (`results/extra/processor_D_circuit.qasm`, 3300 bytes) formatted for standard submission to the IBM Quantum runtime API. A nanosecond pulse duration analysis based on fixed-frequency transmon characteristics revealed that our 81 $R_Z$ gates execute in **0 ns** via virtual Z frame changes, 27 $S_X$ pulses take **$35.55$ ns** each, and 102 CX cross-resonance gates take **$250.0$ ns** each. The total critical path execution latency is **$16.45 \ \mu\text{s}$**—comfortably below the physical $T_1/T_2$ coherence threshold ($\sim 150 \ \mu\text{s}$), confirming execution feasibility.
 
 ### 6.4 Algorithmic Enhancements: CVaR QAOA, Error Mitigation, Co-Design, and Constraint-Preserving Mixers
 
 Beyond the improvements discussed above, we implemented four additional algorithmic enhancements and measured their impact on the locked PS-O3 instance.
 
 1. **Conditional Value-at-Risk (CVaR) QAOA:**
-   Instead of minimising the mean cost $\langle C \rangle$, CVaR-QAOA minimises the average of the worst $\alpha$ fraction of outcomes (Rockafellar–Uryasev formulation). This tail-focused objective forces the optimizer to push probability mass away from high-cost states and toward low-cost (good) states. We swept $\alpha \in \{0.05, 0.1, 0.2, 0.3\}$ with the same 5 seeds (0–4):
+   Instead of minimising the mean cost $\langle C \rangle$, CVaR-QAOA minimises the average of the best (lowest-cost) $\alpha$ fraction of sampled outcomes (Rockafellar–Uryasev formulation adapted for minimization). This tail-focused objective forces the optimizer to push probability mass directly into the lowest-cost states. Sweeping $\alpha \in \{0.05, 0.1, 0.2, 0.3\}$ (reporting the best of 20 runs across multiple seeds):
 
    | $\alpha$ | Best Seed | $P_{\text{feasible}}$ | $P_{\text{opt}}$ | CVaR Cost |
    |---|---|---|---|---|
@@ -422,7 +430,7 @@ Beyond the improvements discussed above, we implemented four additional algorith
    | Constraint-Preserving XY | Ideal | **1.0000** | **0.0747** | 861 |
    | Constraint-Preserving XY | Noisy | 0.9016 | 0.0286 | 861 |
 
-   In the ideal case, the CP mixer achieves **$100\%$ feasibility** and a **$3.3\times$ improvement** in $P_{\text{opt}}$ (from $2.25\%$ to $7.47\%$, **$2.4\times$ the random baseline**). The CX count is higher (861 vs 102) because the `initialize` instruction and the RXX/RYY mixer gates are more expensive than the simple RX mixer, making the circuit more noise-sensitive. Under noise, $P_{\text{feasible}}$ drops to $90\%$ but $P_{\text{opt}}$ still improves to $2.86\%$, beating the standard mixer's $2.25\%$. This demonstrates the fundamental trade-off: constraint-preserving mixers guarantee feasibility in principle, but the deeper circuit exposes the state to more depolarizing noise.
+   In the ideal case, the CP mixer achieves **$100\%$ feasibility** and $P_{\text{opt}} = 7.47\%$. Because the CP mixer restricts state evolution strictly within the 28 feasible states, the fair random-guessing baseline inside this feasible subspace is $\frac{1}{28} \approx 3.57\%$ (rather than $\frac{1}{32} = 3.125\%$ across all states). Against this fair in-subspace baseline, the CP mixer achieves a **$2.1\times$ gain** (and a **$3.3\times$ improvement** over standard $p=1$ QAOA on D). The CX count is higher (861 vs 102) because the `initialize` instruction and the RXX/RYY mixer gates are more expensive than the simple RX mixer, making the circuit more noise-sensitive. Under noise, $P_{\text{feasible}}$ drops to $90\%$ but $P_{\text{opt}}$ still improves to $2.86\%$, beating the standard mixer's $2.25\%$. This demonstrates the fundamental trade-off: constraint-preserving mixers guarantee feasibility in principle, but the deeper circuit exposes the state to more depolarizing noise.
 
 ### 6.5 Advanced Algorithmic Extensions
 
