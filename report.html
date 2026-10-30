@@ -5,12 +5,15 @@
   <title>QFF 2026 Phase 2 Technical Report — Emerging Genius</title>
   
   <script>
-    MathJax = {
+    window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']]
       },
-      svg: { fontCache: 'global' }
+      svg: { fontCache: 'global' },
+      startup: {
+        typeset: true
+      }
     };
   </script>
   <script type="text/javascript" id="MathJax-script" async
@@ -225,7 +228,7 @@
 <hr />
 <h2>Executive Summary</h2>
 <p>This report presents an end-to-end implementation, verification, and hardware-architecture benchmarking of the 0/1 Knapsack Problem (Problem Statement PS-O3) using the Quantum Approximate Optimization Algorithm (QAOA) for Phase 2 of the Qiskit Fall Fest 2026 Optimization Track.</p>
-<p>The locked knapsack instance consists of 5 items with values $v = [10, 4, 7, 5, 8]$, weights $w = [5, 3, 4, 2, 6]$, and a weight capacity constraint $W = 15$. The problem is rigorously formulated into an unconstrained Quadratic Unconstrained Binary Optimization (QUBO) model using a 4-qubit binary slack encoding ($s = s_0 + 2s_1 + 4s_2 + 8s_3 \in {0, \dots, 15}$) and a quadratic penalty multiplier $P = 5$, requiring exactly 9 logical qubits. The classical optimum is found by exhaustive search over all 32 subsets to be $V^* = 26$ (items ${1, 2, 3, 4}$ with total weight 14), with 28 out of 32 subsets ($87.5\%$) being feasible.</p>
+<p>The locked knapsack instance consists of 5 items with values $v = [10, 4, 7, 5, 8]$, weights $w = [5, 3, 4, 2, 6]$, and a weight capacity constraint $W = 15$. The problem is rigorously formulated into an unconstrained Quadratic Unconstrained Binary Optimization (QUBO) model using a 4-qubit binary slack encoding ($s = s_0 + 2s_1 + 4s_2 + 8s_3 \in \{0, \dots, 15\}$) and a quadratic penalty multiplier $P = 5$, requiring exactly 9 logical qubits. The classical optimum is found by exhaustive search over all 32 subsets to be $V^* = 26$ (items $\{1, 2, 3, 4\}$ with total weight 14), with 28 out of 32 subsets ($87.5\%$) being feasible.</p>
 <p>The mapped 9-qubit Ising Hamiltonian contains 36 all-to-all $ZZ$ two-qubit interaction terms. We evaluate QAOA at depth $p=1$ across 5 official pseudorandom seeds ($0 \dots 4$) with classical COBYLA parameter optimization. We benchmark performance across three architectures:
 1. <strong>Processor A (5 qubits):</strong> Evaluated as strictly <strong>not executable</strong> under the official capacity rule (needs 9 qubits, has 5).
 2. <strong>Processor B (9 qubits, 12 edges):</strong> Reference benchmark exhibiting significant routing congestion (17 SWAPs, 121 CX gates, depth 117).
@@ -235,7 +238,7 @@
 <h2>1. Problem Definition, Mathematical Formulation &amp; QUBO Construction</h2>
 <h3>1.1 The 0/1 Knapsack Problem</h3>
 <p>The 0/1 Knapsack Problem seeks to select a subset of $N=5$ items to maximize total profit subject to a hard capacity constraint:
-$$\max_{x \in {0, 1}^5} \sum_{i=1}^5 v_i x_i \quad \text{subject to} \quad \sum_{i=1}^5 w_i x_i \le W$$</p>
+$$\max_{x \in \{0, 1\}^5} \sum_{i=1}^5 v_i x_i \quad \text{subject to} \quad \sum_{i=1}^5 w_i x_i \le W$$</p>
 <p>For the locked PS-O3 instance:
 - <strong>Values:</strong> $v = [10, 4, 7, 5, 8]$
 - <strong>Weights:</strong> $w = [5, 3, 4, 2, 6]$
@@ -244,39 +247,39 @@ $$\max_{x \in {0, 1}^5} \sum_{i=1}^5 v_i x_i \quad \text{subject to} \quad \sum_
 <p>Exhaustive evaluation across all $2^5 = 32$ item combinations establishes the exact ground-truth answer key:
 - <strong>Feasible subsets:</strong> Exactly 28 out of 32 subsets satisfy $\sum w_i x_i \le 15$.
 - <strong>Uniform random baseline feasibility:</strong> $P_{\text{feasible}}^{\text{random}} = \frac{28}{32} = 0.8750$ ($87.50\%$).
-- <strong>Optimal subset:</strong> Items ${1, 2, 3, 4}$ with item bitstring $x = (1, 1, 1, 1, 0)$ (index 15).
+- <strong>Optimal subset:</strong> Items $\{1, 2, 3, 4\}$ with item bitstring $x = (1, 1, 1, 1, 0)$ (index 15).
   - Total Weight: $w_1 + w_2 + w_3 + w_4 = 5 + 3 + 4 + 2 = 14 \le 15$
   - Optimal Value: $V^* = 10 + 4 + 7 + 5 = 26$
   - Uniform random baseline optimal probability: $P_{\text{opt}}^{\text{random}} = \frac{1}{32} = 0.03125$ ($3.125\%$).</p>
 <h3>1.3 Binary Slack Variable Formulation &amp; QUBO</h3>
-<p>To convert the inequality constraint into an unconstrained minimization model, we introduce an auxiliary non-negative slack variable $s \in [0, W]$. Because $\sum w_i x_i \le 15$, the required slack range is $0 \le s \le 15$. This is encoded into 4 binary slack variables $s_0, s_1, s_2, s_3 \in {0, 1}$ using powers of two:
-$$s = \sum_{k=0}^3 2^k s_k = s_0 + 2s_1 + 4s_2 + 8s_3 \in {0, 1, \dots, 15}$$</p>
+<p>To convert the inequality constraint into an unconstrained minimization model, we introduce an auxiliary non-negative slack variable $s \in [0, W]$. Because $\sum w_i x_i \le 15$, the required slack range is $0 \le s \le 15$. This is encoded into 4 binary slack variables $s_0, s_1, s_2, s_3 \in \{0, 1\}$ using powers of two:
+$$s = \sum_{k=0}^3 2^k s_k = s_0 + 2s_1 + 4s_2 + 8s_3 \in \{0, 1, \dots, 15\}$$</p>
 <p>The equality constraint is therefore:
 $$\sum_{i=1}^5 w_i x_i + \sum_{k=0}^3 2^k s_k = 15$$</p>
-<p>Assigning decision variables $x_1 \dots x_5$ to qubits $0 \dots 4$ and slack variables $s_0 \dots s_3$ to qubits $5 \dots 8$ yields a 9-qubit state vector $y = (x_1, \dots, x_5, s_0, \dots, s_3)^T \in {0, 1}^9$ with coefficient vector:
+<p>Assigning decision variables $x_1 \dots x_5$ to qubits $0 \dots 4$ and slack variables $s_0 \dots s_3$ to qubits $5 \dots 8$ yields a 9-qubit state vector $y = (x_1, \dots, x_5, s_0, \dots, s_3)^T \in \{0, 1\}^9$ with coefficient vector:
 $$c = (5, 3, 4, 2, 6, 1, 2, 4, 8)^T$$</p>
 <p>With penalty parameter $P = 5$, the QUBO cost function is:
 $$C(y) = -\sum_{i=1}^5 v_i x_i + P \left( \sum_{i=0}^8 c_i y_i - W \right)^2 = y^T Q y + \text{const}$$</p>
 <p>Since $y_i^2 = y_i$ for binary variables:
 - <strong>Diagonal entries ($i = j$):</strong> $Q_{ii} = -v_i + P(c_i^2 - 2 W c_i)$
-- <strong>Off-diagonal entries ($i &lt; j$):</strong> $Q_{ij} = 2 P c_i c_j$
+- <strong>Off-diagonal entries ($i < j$):</strong> $Q_{ij} = 2 P c_i c_j$
 - <strong>Energy constant:</strong> $\text{const} = P W^2 = 5 \times 15^2 = 1125$</p>
 <h4>Explicit $9 \times 9$ Integer QUBO Matrix:</h4>
 <p>$$\begin{pmatrix}
--725 &amp; 150 &amp; 200 &amp; 100 &amp; 300 &amp; 50 &amp; 100 &amp; 200 &amp; 400 \
-0 &amp; -441 &amp; 120 &amp; 60 &amp; 180 &amp; 30 &amp; 60 &amp; 120 &amp; 240 \
-0 &amp; 0 &amp; -573 &amp; 80 &amp; 240 &amp; 40 &amp; 80 &amp; 160 &amp; 320 \
-0 &amp; 0 &amp; 0 &amp; -295 &amp; 120 &amp; 20 &amp; 40 &amp; 80 &amp; 160 \
-0 &amp; 0 &amp; 0 &amp; 0 &amp; -872 &amp; 60 &amp; 120 &amp; 240 &amp; 480 \
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -145 &amp; 20 &amp; 40 &amp; 80 \
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -280 &amp; 80 &amp; 160 \
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -520 &amp; 320 \
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; -880
+-725 & 150 & 200 & 100 & 300 & 50 & 100 & 200 & 400 \\
+0 & -441 & 120 & 60 & 180 & 30 & 60 & 120 & 240 \\
+0 & 0 & -573 & 80 & 240 & 40 & 80 & 160 & 320 \\
+0 & 0 & 0 & -295 & 120 & 20 & 40 & 80 & 160 \\
+0 & 0 & 0 & 0 & -872 & 60 & 120 & 240 & 480 \\
+0 & 0 & 0 & 0 & 0 & -145 & 20 & 40 & 80 \\
+0 & 0 & 0 & 0 & 0 & 0 & -280 & 80 & 160 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & -520 & 320 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -880
 \end{pmatrix}$$</p>
-<p><strong>Mathematical Verification:</strong> The matrix formulation was verified across all $2^9 = 512$ bitstrings against the direct algebraic cost formula, with absolute residual error $&lt; 10^{-9}$. The unique global minimum occurs at bitstring $b = 47$ ($x = (1, 1, 1, 1, 0)$, $s = (1, 0, 0, 0) \implies \text{slack} = 1$). Because $14 + 1 = 15$, the constraint is exactly satisfied, producing minimal cost $C = -26 = -V^*$.</p>
+<p><strong>Mathematical Verification:</strong> The matrix formulation was verified across all $2^9 = 512$ bitstrings against the direct algebraic cost formula, with absolute residual error $< 10^{-9}$. The unique global minimum occurs at bitstring $b = 47$ ($x = (1, 1, 1, 1, 0)$, $s = (1, 0, 0, 0) \implies \text{slack} = 1$). Because $14 + 1 = 15$, the constraint is exactly satisfied, producing minimal cost $C = -26 = -V^*$.</p>
 <h3>1.4 Ising Hamiltonian Mapping &amp; Scaling</h3>
 <p>Using the spin transformation $y_i = \frac{I - Z_i}{2}$, the QUBO maps onto the Ising Hamiltonian:
-$$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \text{offset}$$</p>
+$$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i < j \le 8} J_{ij} Z_i Z_j + \text{offset}$$</p>
 <ul>
 <li><strong>Two-qubit coupling terms:</strong> $\binom{9}{2} = 36$ non-zero $ZZ$ terms (dense, all-to-all connectivity).</li>
 <li><strong>Single-qubit terms:</strong> 9 non-zero $Z$ terms.</li>
@@ -294,7 +297,7 @@ $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \tex
 <li><strong>Satellite Communications &amp; GPS Beacon ($v_4=5, w_4=2$ kg, vol=1 L):</strong> Emergency satellite transceivers enabling trapped teams to coordinate rescue extraction.</li>
 <li><strong>Portable Micro-Generator &amp; Batteries ($v_5=8, w_5=6$ kg, vol=5 L):</strong> Heavy rechargeable battery pack for field clinic diagnostic equipment.</li>
 <li><strong>Ground-Truth Mission Optimum:</strong>
-  Classical exhaustive search confirms the optimal payload is items ${1, 2, 3, 4}$, yielding maximum survival utility $V^* = 26$ points at weight $14$ kg ($\le 15$ kg) and volume $10$ L ($\le 10$ L). Item 5 (generator) is rejected because its excessive mass (6 kg) would force the exclusion of medical and water supplies.</li>
+  Classical exhaustive search confirms the optimal payload is items $\{1, 2, 3, 4\}$, yielding maximum survival utility $V^* = 26$ points at weight $14$ kg ($\le 15$ kg) and volume $10$ L ($\le 10$ L). Item 5 (generator) is rejected because its excessive mass (6 kg) would force the exclusion of medical and water supplies.</li>
 </ul>
 <h4>Mission 2: Low Earth Orbit (LEO) Satellite Instrument Slot Allocation (NewSpace Aerospace)</h4>
 <ul>
@@ -306,7 +309,7 @@ $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \tex
 <li><strong>Autonomous Star Tracker &amp; Inertial Sensor ($v_4=5, w_4=2$ kg, $p_4=1$ W):</strong> Sub-arcsecond attitude determination required for precision earth imaging.</li>
 <li><strong>Deep Space Radiation Particle Spectrometer ($v_5=8, w_5=6$ kg, $p_5=5$ W):</strong> Auxiliary space-weather sensor for solar flare forecasting.</li>
 <li><strong>Ground-Truth Mission Optimum:</strong>
-  Instruments ${1, 2, 3, 4}$ yield maximal scientific telemetry value $V^* = 26$ within $14$ kg launch mass and $10$ W bus power envelope.</li>
+  Instruments $\{1, 2, 3, 4\}$ yield maximal scientific telemetry value $V^* = 26$ within $14$ kg launch mass and $10$ W bus power envelope.</li>
 </ul>
 <h4>Mission 3: Extreme Weather Clean Energy Microgrid Asset Dispatch (Smart Grid Resilience)</h4>
 <ul>
@@ -318,7 +321,7 @@ $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \tex
 <li><strong>Emergency Services Dispatch Radio Network ($v_4=5, w_4=2$ MWh, ramp=1 MW):</strong> First-responder communications and emergency call centers.</li>
 <li><strong>Commercial District Cold-Start Auxiliary Generator ($v_5=8, w_5=6$ MWh, ramp=5 MW):</strong> Heavy auxiliary backup generation.</li>
 <li><strong>Ground-Truth Mission Optimum:</strong>
-  Feeders ${1, 2, 3, 4}$ maintain total critical resilience score $V^* = 26$ utilizing $14$ MWh and $10$ MW ramp headroom, guaranteeing zero civilian casualties.</li>
+  Feeders $\{1, 2, 3, 4\}$ maintain total critical resilience score $V^* = 26$ utilizing $14$ MWh and $10$ MW ramp headroom, guaranteeing zero civilian casualties.</li>
 </ul>
 <h4>Mission 4: Quantum High-Frequency Risk-Parity Arbitrage (Quantitative Finance)</h4>
 <ul>
@@ -330,7 +333,7 @@ $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \tex
 <li><strong>Cryptographic Asset Cross-Exchange Flash Pool ($v_4=5, w_4=2$ M$, VaR=1 bps):</strong> Microsecond cross-venue latency arbitrage.</li>
 <li><strong>Macro Commodity Supercycle Long Exposure ($v_5=8, w_5=6$ M$, VaR=5 bps):</strong> Directional metals and energy hedge.</li>
 <li><strong>Ground-Truth Mission Optimum:</strong>
-  Strategies ${1, 2, 3, 4}$ achieve optimal risk-adjusted Sharpe return $V^* = 26$ requiring $14M margin and 10 bps stress envelope.</li>
+  Strategies $\{1, 2, 3, 4\}$ achieve optimal risk-adjusted Sharpe return $V^* = 26$ requiring $14M margin and 10 bps stress envelope.</li>
 </ul>
 <h4>Mission 5: Autonomous Mars Rover Edge AI Sensor &amp; Compute Scheduling (Planetary Robotics)</h4>
 <ul>
@@ -342,12 +345,12 @@ $$H_C = \sum_{i=0}^8 h_i Z_i + \sum_{0 \le i &lt; j \le 8} J_{ij} Z_i Z_j + \tex
 <li><strong>Direct-to-Earth Telemetry Beamformer Pipeline ($v_4=5, w_4=2$ W, buf=1 GB):</strong> High-gain phased array transmission encoding.</li>
 <li><strong>Drill Core Acoustic Micro-Seismic Classifier ($v_5=8, w_5=6$ W, buf=5 GB):</strong> Sample caching structural verification.</li>
 <li><strong>Ground-Truth Mission Optimum:</strong>
-  Tasks ${1, 2, 3, 4}$ maximize Martian scientific discovery yield $V^* = 26$ within the 14 W thermal envelope and 10 GB storage budget.</li>
+  Tasks $\{1, 2, 3, 4\}$ maximize Martian scientific discovery yield $V^* = 26$ within the 14 W thermal envelope and 10 GB storage budget.</li>
 </ul>
 <hr />
 <h4>Multi-Constraint QUBO Generalization &amp; Logarithmic Scaling</h4>
 <p>We implemented a generalized module <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/src/case_study.py"><code>src/case_study.py</code></a> that accepts arbitrary item sets and supports dual constraints (Primary Capacity + Secondary Envelope) via log-binary slack variables:
-$$H = -\sum_{i=1}^N v_i x_i + P_w \left(\sum_{i=1}^N w_i x_i + \sum_{k=0}^{K_w-1} 2^k s_k^{(w)} - W\right)^2 + P_v \left(\sum_{i=1}^N \text{vol}<em>i x_i + \sum</em>{k=0}^{K_v-1} 2^k s_k^{(v)} - V\right)^2$$
+$$H = -\sum_{i=1}^N v_i x_i + P_w \left(\sum_{i=1}^N w_i x_i + \sum_{k=0}^{K_w-1} 2^k s_k^{(w)} - W\right)^2 + P_v \left(\sum_{i=1}^N \text{vol}_i x_i + \sum_{k=0}^{K_v-1} 2^k s_k^{(v)} - V\right)^2$$
 where $K_w = \lfloor \log_2 W \rfloor + 1$ and $K_v = \lfloor \log_2 V \rfloor + 1$. The required qubit register scales logarithmically with capacity:
 $$n_{\text{qubits}} = N + \lfloor\log_2 W\rfloor + 1 + \lfloor\log_2 V\rfloor + 1 = \mathcal{O}(N + \log W + \log V)$$</p>
 <h5>Qubit Register Scaling Analysis across Operational Scales</h5>
@@ -422,7 +425,7 @@ $$n_{\text{qubits}} = N + \lfloor\log_2 W\rfloor + 1 + \lfloor\log_2 V\rfloor + 
 <ul>
 <li><strong>Scale factor:</strong> $\text{scale} = \max(|h_i|, |J_{ij}|) = 120.0$.
 To maintain standardized angle scaling for the QAOA phase separation layer without altering the eigenspectrum, the cost Hamiltonian is scaled by 120.0, mapping the evolution operator to:
-$$U(C, \gamma) = \exp\left(-i \frac{\gamma}{\text{scale}} H_C\right) = \prod_{i=0}^8 R_Z\left(\frac{2 \gamma h_i}{\text{scale}}\right) \prod_{i &lt; j} R_{ZZ}\left(\frac{2 \gamma J_{ij}}{\text{scale}}\right)$$</li>
+$$U(C, \gamma) = \exp\left(-i \frac{\gamma}{\text{scale}} H_C\right) = \prod_{i=0}^8 R_Z\left(\frac{2 \gamma h_i}{\text{scale}}\right) \prod_{i < j} R_{ZZ}\left(\frac{2 \gamma J_{ij}}{\text{scale}}\right)$$</li>
 </ul>
 <p>The mixer Hamiltonian is standard transverse field:
 $$U(B, \beta) = \exp\left(-i \beta \sum_{i=0}^8 X_i\right) = \prod_{i=0}^8 R_X(2\beta)$$</p>
@@ -432,9 +435,9 @@ $$U(B, \beta) = \exp\left(-i \beta \sum_{i=0}^8 X_i\right) = \prod_{i=0}^8 R_X(2
 <p>To verify quantum hardware fidelity and quantify routing-induced noise degradation on Processor D, the Bell state $|\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}$ was prepared using $H$ on qubit 0 followed by $CX(0 \to 1)$. The state was measured in the three Pauli bases ($XX, YY, ZZ$) using 4096 shots per basis under both ideal and official noisy simulation.</p>
 <h3>2.1 Correlation &amp; Fidelity Formalism</h3>
 <p>For two-qubit parity measurements, the correlation and standard error are:
-$$\langle P \rangle = \frac{N_{\text{even}} - N_{\text{odd}}}{N}, \quad \mathrm{SE}(\langle P \rangle) = \sqrt{\frac{1 - \langle P \rangle^2}{N}}$$</p>
+$$\langle P \rangle = \frac{N_{\text{even}} - N_{\text{odd}}}{N}, \quad \sigma_{\langle P \rangle} = \sqrt{\frac{1 - \langle P \rangle^2}{N}}$$</p>
 <p>Because $|\Phi^+\rangle\langle\Phi^+| = \frac{1}{4}(II + XX - YY + ZZ)$, state fidelity is computed as:
-$$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}, \quad \mathrm{SE}(F) = \frac{1}{4}\sqrt{\mathrm{SE}<em>{XX}^2 + \mathrm{SE}</em>{YY}^2 + \mathrm{SE}_{ZZ}^2}$$</p>
+$$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}, \quad \sigma_F = \frac{1}{4}\sqrt{\sigma_{XX}^2 + \sigma_{YY}^2 + \sigma_{ZZ}^2}$$</p>
 <h3>2.2 Measured Bell Results on Processor D</h3>
 <p>The measurements were performed on two physical pairs:
 1. <strong>Adjacent Pair $(0, 1)$:</strong> Distance 1 in the coupling graph. Transpiled circuit depth = 2, CX count = 1.
@@ -513,14 +516,14 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 1. <strong>Qubit Count:</strong> 9 qubits (within $[9, 12]$).
 2. <strong>Connectivity:</strong> Connected graph.
 3. <strong>Maximum Degree:</strong> Uniform degree 4 (within $\le 4$).
-4. <strong>Gate Set:</strong> Basis gates strictly ${\text{rz}, \text{sx}, \text{x}, \text{cx}}$.
+4. <strong>Gate Set:</strong> Basis gates strictly $\{\text{rz}, \text{sx}, \text{x}, \text{cx}\}$.
 5. <strong>Noise Model:</strong> Identical to the official synthetic noise model ($p_1 = 0.001, p_2 = 0.005, p_{\text{readout}} = 0.01$).</p>
 <p>Both our internal validator and the official organizer validator <code>validate_processor_d(D, 9)</code> verified compliance with <strong>0 errors</strong>.</p>
 <p><img alt="Processor Coupling Graphs" src="results/figures/processors_graphs.png" />
 <img alt="Processor D Architecture" src="results/figures/processor_D_graph.png" /></p>
 <h3>3.2 Topology Search &amp; Pareto Trade-Off Analysis</h3>
 <p>In PS-O3, the 9-qubit knapsack Hamiltonian requires 36 non-local two-qubit interactions. We performed a comprehensive hardware topology search over 48 candidate architectures across 9 to 12 qubits, evaluating ring topologies, degree-3 planar grids, degree-4 planar grids, 10–12 qubit variants with spare ancilla routing slack, circulants, and random 4-regular graphs.</p>
-<p><img alt="Architecture Trade-Off Analysis: Pareto Frontier for Processor D" src="results/figures/pareto_design_d.png" /></p>
+<p><img alt="Architecture Trade-Off Analysis: Pareto Frontier for Processor D — Selection of $C_9(1, 2)$ (circulant_n9_o1-2)" src="results/figures/pareto_design_d.png" /></p>
 <h4>Chip Cost Proxy vs. Routing Overhead (The Pareto Frontier)</h4>
 <p>On physical quantum processors, the <strong>number of coupling edges</strong> serves as a direct proxy for physical hardware cost, lithographic wiring complexity, control-line cross-routing, and fabrication yield. High-degree architectures require dense multi-layer wiring and introduce greater susceptibility to frequency collisions and residual $ZZ$-crosstalk. Conversely, sparse topologies reduce hardware cost but catastrophically amplify the circuit execution overhead:</p>
 <div class="table-container"><table>
@@ -658,7 +661,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <p><strong>Post-Execution Measured Outcome:</strong></p>
 </li>
 <li><em>SWAP Count:</em> Transpilation for Processor D required <strong>10 SWAPs</strong>, compared to <strong>17 SWAPs</strong> on Processor B. This is a reduction of <strong>exactly 7 fewer SWAPs</strong> (<strong>41.2% reduction</strong>), falling dead center in our predicted $[6, 8]$ range.</li>
-<li><em>CX Gate Overhead:</em> Total physical CX gates dropped from 121 to 102, saving <strong>19 CX gates</strong> (a <strong>38.8% reduction in routing overhead</strong>), matching our predicted $[18, 24]$ window.</li>
+<li><em>CX Gate Overhead:</em> Total physical CX gates dropped from 121 to 102, saving <strong>19 CX gates</strong> (a <strong>38.8% reduction in routing overhead</strong>, or <strong>15.7% reduction in total CX gates</strong>: from 121 down to 102), matching our predicted $[18, 24]$ window.</li>
 <li><em>Circuit Depth:</em> Two-qubit circuit depth dropped from 79 to 59 (<strong>25.3% reduction</strong>), perfectly matching our $20\text{–}30\%$ prediction window. Total circuit depth decreased from 117 to 87 (<strong>25.6% reduction</strong>).</li>
 <li><em>Noisy Solution Energy:</em> Measured sampled noisy QUBO cost decreased from $82.85$ on B down to $74.96$ on D (a <strong>$7.89$ energy unit improvement</strong>). The theoretical prediction is thus quantitatively and empirically confirmed.</li>
 </ul>
@@ -670,7 +673,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <ul>
 <li><strong>Processor A:</strong> 5 physical qubits, 4 edges.</li>
 <li><strong>Status:</strong> <strong>Not executable: needs 9 qubits, has 5.</strong></li>
-<li><strong>Capacity Analysis:</strong> The 0/1 knapsack problem requires 5 decision qubits for the items and 4 binary slack qubits ($w \in {1, 2, 4, 8}$) to represent the inequality constraint up to capacity 15 without truncation. Truncating the slack bits to fit onto 5 qubits would alter the locked mathematical formulation and destroy constraint feasibility guarantees. Therefore, Processor A cannot execute PS-O3.</li>
+<li><strong>Capacity Analysis:</strong> The 0/1 knapsack problem requires 5 decision qubits for the items and 4 binary slack qubits ($w \in \{1, 2, 4, 8\}$) to represent the inequality constraint up to capacity 15 without truncation. Truncating the slack bits to fit onto 5 qubits would alter the locked mathematical formulation and destroy constraint feasibility guarantees. Therefore, Processor A cannot execute PS-O3.</li>
 </ul>
 <h3>4.2 Benchmark Results Table</h3>
 <p>Directly extracted from <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results.csv"><code>results/tables/results.csv</code></a> and <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/results/tables/results_detail.csv"><code>results/tables/results_detail.csv</code></a>:</p>
@@ -843,7 +846,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <li>Measured QAOA sampling rates: $0.0210$ (B ideal), $0.0249$ (B noisy), $0.0225$ (D ideal), and $0.0225$ (D noisy).</li>
 <li>At depth $p=1$, QAOA does <strong>not</strong> beat uniform random guessing for finding the single ground state.</li>
 <li><strong>Saturation of Best Feasible Value:</strong></li>
-<li>Across 4096 shots, the probability of sampling the optimal combination at least once exceeds $1 - (1 - 0.0225)^{4096} \approx 100\%$. Both Processor B and Processor D achieve $V^<em> = 26$ (items ${1, 2, 3, 4}$, weight 14), corresponding to </em><em>100.0% of the optimal value</em>*.</li>
+<li>Across 4096 shots, the probability of sampling the optimal combination at least once exceeds $1 - (1 - 0.0225)^{4096} \approx 100\%$. Both Processor B and Processor D achieve $V^* = 26$ (items $\{1, 2, 3, 4\}$, weight 14), corresponding to <strong>100.0% of the optimal value</strong>.</li>
 </ul>
 <hr />
 <h2>5. Objective Landscape Analysis on Processor D</h2>
@@ -925,8 +928,8 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 </table></div>
 <h3>5.2 Landscape Topography &amp; Noise Flattening</h3>
 <ul>
-<li><strong>Global Optimum Location:</strong> The COBYLA optimizer converged from Seed 1 to the global minimum at $(\gamma^<em> = 0.2831, \beta^</em> = 2.8648)$ with expectation $-1.5232$. This matches the noisy sampled landscape grid, where the grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.</li>
-<li><strong>Narrowness of the Convergence Valley:</strong> The landscape reveals a steep, narrow ravine confined to $\gamma \in [0.20, 0.35]$. For $\gamma &gt; 0.40$, the dense interference of 36 non-commuting $ZZ$ rotations creates a chaotic, oscillatory plateau.</li>
+<li><strong>Global Optimum Location:</strong> The COBYLA optimizer converged from Seed 1 to the global minimum at $\gamma^* = 0.2831, \beta^* = 2.8648$ with expectation $\langle C_{\text{scaled}} \rangle = -1.5232$. This directly matches the noisy sampled landscape grid, where the empirical grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.</li>
+<li><strong>Narrowness of the Convergence Valley:</strong> The landscape reveals a steep, narrow ravine confined to $\gamma \in [0.20, 0.35]$. For $\gamma > 0.40$, the dense interference of 36 non-commuting $ZZ$ rotations creates a chaotic, oscillatory plateau.</li>
 <li><strong>Why Seeds 0, 2, and 4 Failed:</strong> Seeds 0, 2, and 4 initialized at $\gamma_0 \gg 0.40$. Landing in the flat, highly corrugated plateau, the gradient-free COBYLA optimizer became trapped in negligible local ripples, yielding expectations near zero ($-0.0081, -0.0057, -0.0007$) and feasibility rates indistinguishable from uniform random guessing ($87.3\% - 87.6\%$). Only seeds initialized near or below the valley (Seeds 1 and 3) descended into the true minimum.</li>
 <li><strong>Noise Attenuation:</strong> Depolarizing and readout noise contract the dynamic range of the landscape and lift the mean grid cost to $322.03$ (well above the random baseline cost of $233.0$), smoothing the steep valley walls.</li>
 </ul>
@@ -944,7 +947,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <li><strong>Shifted-Target Quadratic Penalty (Slack Elimination):</strong>
    <em>Method:</em> Replace the 4 binary slack qubits with a shifted-target quadratic penalty applied directly to the 5 item variables, targeting $W_{\text{eff}} = 14$ (the optimal feasible weight) instead of $W = 15$:
    $$P_{\text{shifted}}(x) = P \left(\sum w_i x_i - W_{\text{eff}}\right)^2$$
-   <em>Evidence:</em> Eliminating the 4 slack qubits reduces the problem from 9 qubits to 5 qubits and drops $ZZ$ interactions from 36 to 10. This reduces circuit depth by $&gt;60\%$ and allows the problem to execute on compact 5-qubit processors like Processor A.</li>
+   <em>Evidence:</em> Eliminating the 4 slack qubits reduces the problem from 9 qubits to 5 qubits and drops $ZZ$ interactions from 36 to 10. This reduces circuit depth by $>60\%$ and allows the problem to execute on compact 5-qubit processors like Processor A.</li>
 </ol>
 <p><img alt="Shifted-Target vs Slack Comparison" src="results/figures/shifted_target_vs_slack.png" /></p>
 <ol>
@@ -975,7 +978,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <p>Beyond the improvements discussed above, we implemented four additional algorithmic enhancements and measured their impact on the locked PS-O3 instance.</p>
 <ol>
 <li><strong>Conditional Value-at-Risk (CVaR) QAOA:</strong>
-   Instead of minimising the mean cost $\langle C \rangle$, CVaR-QAOA minimises the average of the worst $\alpha$ fraction of outcomes (Rockafellar–Uryasev formulation). This tail-focused objective forces the optimizer to push probability mass away from high-cost states and toward low-cost (good) states. We swept $\alpha \in {0.05, 0.1, 0.2, 0.3}$ with the same 5 seeds (0–4):</li>
+   Instead of minimising the mean cost $\langle C \rangle$, CVaR-QAOA minimises the average of the worst $\alpha$ fraction of outcomes (Rockafellar–Uryasev formulation). This tail-focused objective forces the optimizer to push probability mass away from high-cost states and toward low-cost (good) states. We swept $\alpha \in \{0.05, 0.1, 0.2, 0.3\}$ with the same 5 seeds (0–4):</li>
 </ol>
 <div class="table-container"><table>
 <thead>
@@ -1216,7 +1219,7 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <ol>
 <li>
 <p><strong>Recursive QAOA (RQAOA):</strong>
-   The QAOA correlator $\langle Z_0 Z_4 \rangle = -0.131$ between items 1 and 5 indicates anti-correlation. RQAOA eliminates item 5 using the rule $x_5 = 1 - x_1$, reduces the knapsack to 4 items, and solves the reduced problem exhaustively. The reconstructed solution is items ${1, 2, 3, 4}$ with value $26 = V^<em>$ and weight $14$ — the exact optimum, found </em><em>deterministically</em>*. Unlike sampling-based QAOA, RQAOA never misses the optimum.</p>
+   The QAOA correlator $\langle Z_0 Z_4 \rangle = -0.131$ between items 1 and 5 indicates anti-correlation. RQAOA eliminates item 5 using the rule $x_5 = 1 - x_1$, reduces the knapsack to 4 items, and solves the reduced problem exhaustively. The reconstructed solution is items $\{1, 2, 3, 4\}$ with value $26 = V^*$ and weight $14$ — the exact optimum, found <strong>deterministically</strong>. Unlike sampling-based QAOA, RQAOA never misses the optimum.</p>
 </li>
 <li>
 <p><strong>Adaptive Penalty Scheduling (Homotopy Continuation):</strong>
@@ -1279,7 +1282,8 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 </table></div>
 <p>At $P=5$ via homotopy, $P_{\text{feasible}} = 0.955$ (comparable to the best standard seed at $0.955$) but with only <strong>1 optimization start</strong> instead of 5 — the warm start completely avoids the seed-stuck problem where 3 of 5 seeds fail at $P=5$.</p>
 <ol>
-<li><strong>Grover Adaptive Search (GAS):</strong> (described above in Section 6.5 introduction)</li>
+<li><strong>Grover Adaptive Search (GAS):</strong>
+   In addition to variational QAOA, we implemented Grover Adaptive Search (<a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/src/gas.py"><code>src/gas.py</code></a>), which applies quantum amplitude amplification with iterative threshold lowering to locate low-cost QUBO states without classical parameter optimization. In each round, an oracle marks states strictly below the current threshold $y_{\text{best}}$, Grover diffusion amplifies their probability with $\mathcal{O}(\sqrt{N_{\text{total}} / N_{\text{marked}}})$ iterations, and the sampled state updates the threshold. On the locked 9-qubit knapsack problem, GAS successfully identified the global optimum ($V^* = 26$, cost $-26.0$) within 12 threshold-lowering rounds. However, on NISQ hardware without fault tolerance, deep Grover diffusion circuits suffer substantially higher gate-error accumulation compared to low-depth QAOA ($p=1$), making QAOA with Processor D co-design the superior architecture for near-term quantum execution.</li>
 </ol>
 <hr />
 <h2>7. Cross-Validation Against Official Toolkit &amp; Engineering Quality</h2>
@@ -1295,12 +1299,12 @@ $$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}
 <ul>
 <li><strong>Automated Pytest Test Suite (<code>tests/</code>):</strong>
   We implemented 16 automated unit test cases spanning four specialized test modules:</li>
-<li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_knapsack.py"><code>tests/test_knapsack.py</code></a>: Validates exact ground truth $V^*=26$, items ${1,2,3,4}$, QUBO matrix parity with algebraic penalty, Ising Hamiltonian mapping, and uniform random baseline statistics ($87.5\%$ feasible, $3.125\%$ optimal).</li>
+<li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_knapsack.py"><code>tests/test_knapsack.py</code></a>: Validates exact ground truth $V^*=26$, items $\{1,2,3,4\}$, QUBO matrix parity with algebraic penalty, Ising Hamiltonian mapping, and uniform random baseline statistics ($87.5\%$ feasible, $3.125\%$ optimal).</li>
 <li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_circuits.py"><code>tests/test_circuits.py</code></a>: Validates QAOA circuit synthesis, Bell state projector formulas $F = (1+\langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle)/4$, and basis gate transpilation compliance.</li>
-<li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_processors.py"><code>tests/test_processors.py</code></a>: Validates Processor A capacity limits ($n=5 &lt; 9$), Processor B topology, and executes dual validation (internal + official <code>qff_phase2.validate_processor_d</code>) on Processor D.</li>
+<li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_processors.py"><code>tests/test_processors.py</code></a>: Validates Processor A capacity limits ($n=5 < 9$), Processor B topology, and executes dual validation (internal + official <code>qff_phase2.validate_processor_d</code>) on Processor D.</li>
 <li><a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/test_case_study.py"><code>tests/test_case_study.py</code></a>: Tests generalized multi-constraint QUBO builder, disaster-relief payload optimization, and logarithmic slack scaling.</li>
 <li><strong>Standalone Fast Formulation Check:</strong>
-  <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/check_formulation.py"><code>tests/check_formulation.py</code></a> executes zero-dependency mathematical sanity checks in $&lt;0.2$ seconds.</li>
+  <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/tests/check_formulation.py"><code>tests/check_formulation.py</code></a> executes zero-dependency mathematical sanity checks in $<0.2$ seconds.</li>
 <li><strong>GitHub Actions Continuous Integration:</strong>
   <a href="file:///Users/vaatsavkrishna/QFF/qff_ps_o3/.github/workflows/ci.yml"><code>.github/workflows/ci.yml</code></a> automates linting, test execution, formulation checks, and official processor validation upon every commit on Ubuntu with Python 3.11.</li>
 <li><strong>Pinned Dependency Environment:</strong>

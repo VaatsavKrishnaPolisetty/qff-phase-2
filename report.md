@@ -181,10 +181,10 @@ To verify quantum hardware fidelity and quantify routing-induced noise degradati
 
 ### 2.1 Correlation & Fidelity Formalism
 For two-qubit parity measurements, the correlation and standard error are:
-$$\langle P \rangle = \frac{N_{\text{even}} - N_{\text{odd}}}{N}, \quad \mathrm{SE}(\langle P \rangle) = \sqrt{\frac{1 - \langle P \rangle^2}{N}}$$
+$$\langle P \rangle = \frac{N_{\text{even}} - N_{\text{odd}}}{N}, \quad \sigma_{\langle P \rangle} = \sqrt{\frac{1 - \langle P \rangle^2}{N}}$$
 
 Because $|\Phi^+\rangle\langle\Phi^+| = \frac{1}{4}(II + XX - YY + ZZ)$, state fidelity is computed as:
-$$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}, \quad \mathrm{SE}(F) = \frac{1}{4}\sqrt{\mathrm{SE}_{XX}^2 + \mathrm{SE}_{YY}^2 + \mathrm{SE}_{ZZ}^2}$$
+$$F = \frac{1 + \langle XX \rangle - \langle YY \rangle + \langle ZZ \rangle}{4}, \quad \sigma_F = \frac{1}{4}\sqrt{\sigma_{XX}^2 + \sigma_{YY}^2 + \sigma_{ZZ}^2}$$
 
 ### 2.2 Measured Bell Results on Processor D
 
@@ -224,7 +224,7 @@ Both our internal validator and the official organizer validator `validate_proce
 ### 3.2 Topology Search & Pareto Trade-Off Analysis
 In PS-O3, the 9-qubit knapsack Hamiltonian requires 36 non-local two-qubit interactions. We performed a comprehensive hardware topology search over 48 candidate architectures across 9 to 12 qubits, evaluating ring topologies, degree-3 planar grids, degree-4 planar grids, 10–12 qubit variants with spare ancilla routing slack, circulants, and random 4-regular graphs.
 
-![Architecture Trade-Off Analysis: Pareto Frontier for Processor D](results/figures/pareto_design_d.png)
+![Architecture Trade-Off Analysis: Pareto Frontier for Processor D — Selection of $C_9(1, 2)$ (circulant_n9_o1-2)](results/figures/pareto_design_d.png)
 
 #### Chip Cost Proxy vs. Routing Overhead (The Pareto Frontier)
 On physical quantum processors, the **number of coupling edges** serves as a direct proxy for physical hardware cost, lithographic wiring complexity, control-line cross-routing, and fabrication yield. High-degree architectures require dense multi-layer wiring and introduce greater susceptibility to frequency collisions and residual $ZZ$-crosstalk. Conversely, sparse topologies reduce hardware cost but catastrophically amplify the circuit execution overhead:
@@ -260,7 +260,7 @@ In accordance with rubric requirements, we pre-documented our analytical archite
 
 - **Post-Execution Measured Outcome:**
   - *SWAP Count:* Transpilation for Processor D required **10 SWAPs**, compared to **17 SWAPs** on Processor B. This is a reduction of **exactly 7 fewer SWAPs** (**41.2% reduction**), falling dead center in our predicted $[6, 8]$ range.
-  - *CX Gate Overhead:* Total physical CX gates dropped from 121 to 102, saving **19 CX gates** (a **38.8% reduction in routing overhead**), matching our predicted $[18, 24]$ window.
+  - *CX Gate Overhead:* Total physical CX gates dropped from 121 to 102, saving **19 CX gates** (a **38.8% reduction in routing overhead**, or **15.7% reduction in total CX gates**: from 121 down to 102), matching our predicted $[18, 24]$ window.
   - *Circuit Depth:* Two-qubit circuit depth dropped from 79 to 59 (**25.3% reduction**), perfectly matching our $20\text{–}30\%$ prediction window. Total circuit depth decreased from 117 to 87 (**25.6% reduction**).
   - *Noisy Solution Energy:* Measured sampled noisy QUBO cost decreased from $82.85$ on B down to $74.96$ on D (a **$7.89$ energy unit improvement**). The theoretical prediction is thus quantitatively and empirically confirmed.
 
@@ -329,7 +329,7 @@ Five pseudorandom starting angles were drawn according to the official protocol 
 | **4** | 2.9627 | 1.6064 | 4.0598 | 1.5992 | -0.0007 | 67 | 0.8751 | 0.0311 |
 
 ### 5.2 Landscape Topography & Noise Flattening
-- **Global Optimum Location:** The COBYLA optimizer converged from Seed 1 to the global minimum at $(\gamma^* = 0.2831, \beta^* = 2.8648)$ with expectation $-1.5232$. This matches the noisy sampled landscape grid, where the grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.
+- **Global Optimum Location:** The COBYLA optimizer converged from Seed 1 to the global minimum at $\gamma^* = 0.2831, \beta^* = 2.8648$ with expectation $\langle C_{\text{scaled}} \rangle = -1.5232$. This directly matches the noisy sampled landscape grid, where the empirical grid minimum of $78.36$ occurs at $\gamma = 0.263, \beta = 2.811$.
 - **Narrowness of the Convergence Valley:** The landscape reveals a steep, narrow ravine confined to $\gamma \in [0.20, 0.35]$. For $\gamma > 0.40$, the dense interference of 36 non-commuting $ZZ$ rotations creates a chaotic, oscillatory plateau.
 - **Why Seeds 0, 2, and 4 Failed:** Seeds 0, 2, and 4 initialized at $\gamma_0 \gg 0.40$. Landing in the flat, highly corrugated plateau, the gradient-free COBYLA optimizer became trapped in negligible local ripples, yielding expectations near zero ($-0.0081, -0.0057, -0.0007$) and feasibility rates indistinguishable from uniform random guessing ($87.3\% - 87.6\%$). Only seeds initialized near or below the valley (Seeds 1 and 3) descended into the true minimum.
 - **Noise Attenuation:** Depolarizing and readout noise contract the dynamic range of the landscape and lift the mean grid cost to $322.03$ (well above the random baseline cost of $233.0$), smoothing the steep valley walls.
@@ -464,7 +464,8 @@ Beyond the improvements discussed above, we implemented five additional algorith
 
    At $P=5$ via homotopy, $P_{\text{feasible}} = 0.955$ (comparable to the best standard seed at $0.955$) but with only **1 optimization start** instead of 5 — the warm start completely avoids the seed-stuck problem where 3 of 5 seeds fail at $P=5$.
 
-5. **Grover Adaptive Search (GAS):** (described above in Section 6.5 introduction)
+5. **Grover Adaptive Search (GAS):**
+   In addition to variational QAOA, we implemented Grover Adaptive Search ([`src/gas.py`](file:///Users/vaatsavkrishna/QFF/qff_ps_o3/src/gas.py)), which applies quantum amplitude amplification with iterative threshold lowering to locate low-cost QUBO states without classical parameter optimization. In each round, an oracle marks states strictly below the current threshold $y_{\text{best}}$, Grover diffusion amplifies their probability with $\mathcal{O}(\sqrt{N_{\text{total}} / N_{\text{marked}}})$ iterations, and the sampled state updates the threshold. On the locked 9-qubit knapsack problem, GAS successfully identified the global optimum ($V^* = 26$, cost $-26.0$) within 12 threshold-lowering rounds. However, on NISQ hardware without fault tolerance, deep Grover diffusion circuits suffer substantially higher gate-error accumulation compared to low-depth QAOA ($p=1$), making QAOA with Processor D co-design the superior architecture for near-term quantum execution.
 
 ---
 
