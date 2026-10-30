@@ -180,10 +180,7 @@
           <i data-lucide="clipboard-check" class="w-4 h-4"></i>
           <span>Claims & Rubric Audit</span>
         </button>
-        <button onclick="switchTab('pitch')" id="tab-btn-pitch" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 transition text-slate-400 hover:text-white hover:bg-white/5">
-          <i data-lucide="mic" class="w-4 h-4"></i>
-          <span>Pitch Mode (3-Min)</span>
-        </button>
+
       </div>
     </header>
 
@@ -817,67 +814,7 @@
 
       </section>
 
-      <!-- =================================================================== -->
-      <!-- TAB 7: 3-MINUTE PITCH PRESENTATION MODE -->
-      <!-- =================================================================== -->
-      <section id="tab-content-pitch" class="space-y-8 hidden">
-        
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-white/5">
-          <div>
-            <h2 class="text-2xl lg:text-3xl font-extrabold text-white">3-Minute Video Pitch Teleprompter</h2>
-            <p class="text-slate-400 text-xs mt-1">Synchronized speaker script, slide visual cues, and timer for the final video submission.</p>
-          </div>
 
-          <!-- Pitch Timer -->
-          <div class="flex items-center gap-3">
-            <div class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 font-mono">
-              <span id="pitch-timer-display" class="text-xl font-bold text-brand-cyan">03:00</span>
-              <button id="pitch-timer-btn" onclick="togglePitchTimer()" class="p-1.5 rounded-lg bg-brand-cyan/20 text-brand-cyan hover:bg-brand-cyan/30">
-                <i data-lucide="play" class="w-4 h-4"></i>
-              </button>
-              <button onclick="resetPitchTimer()" class="p-1.5 rounded-lg bg-white/10 text-slate-300 hover:bg-white/20">
-                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 spotlight-card rounded-2xl p-6 space-y-6">
-            <div class="prose prose-invert max-w-none text-xs leading-relaxed space-y-4" id="pitch-script-body">
-              <!-- Populated from PITCH_SCRIPT.md -->
-            </div>
-          </div>
-
-          <div class="spotlight-card rounded-2xl p-6 space-y-4 flex flex-col justify-between">
-            <div class="space-y-4">
-              <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4 text-brand-cyan"></i>
-                Judge Evaluation Highlights
-              </h3>
-              <div class="space-y-2.5 text-xs text-slate-300">
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                  <strong class="text-brand-cyan">0:00 - 0:45:</strong> Ground truth (V*=26, 4 slack bits, exhaustive verification).
-                </div>
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                  <strong class="text-emerald-400">0:45 - 1:30:</strong> Processor D chordal topology (-41.2% SWAPs, Pareto trade-off).
-                </div>
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                  <strong class="text-purple-300">1:30 - 2:15:</strong> Bell fidelity (F=0.9633) & 20x20 noisy landscape.
-                </div>
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                  <strong class="text-teal-400">2:15 - 3:00:</strong> Disaster relief case study & 16 automated tests.
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-4 border-t border-white/5 text-center text-xs text-slate-400">
-              Team Emerging Genius · Ready for Evaluation
-            </div>
-          </div>
-        </div>
-
-      </section>
 
     </main>
 
@@ -1057,7 +994,7 @@
     })();
 
     // 3. Tab Navigation Controller
-    const TABS = ['overview', 'hardware', 'simulator', 'figures', 'explorer', 'rubric', 'pitch'];
+    const TABS = ['overview', 'hardware', 'simulator', 'figures', 'explorer', 'rubric'];
     function switchTab(tabId) {
       TABS.forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -1674,57 +1611,6 @@
       safeLucide();
     }
 
-    // 9. Pitch Teleprompter & Timer
-    let pitchSeconds = 180;
-    let pitchTimer = null;
-
-    function togglePitchTimer() {
-      const btn = document.getElementById('pitch-timer-btn');
-      if (!btn) return;
-      if (pitchTimer) {
-        clearInterval(pitchTimer);
-        pitchTimer = null;
-        btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
-      } else {
-        pitchTimer = setInterval(() => {
-          pitchSeconds--;
-          if (pitchSeconds <= 0) {
-            clearInterval(pitchTimer);
-            pitchTimer = null;
-            btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
-          }
-          updatePitchTimerDisplay();
-        }, 1000);
-        btn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i>';
-      }
-      safeLucide();
-    }
-
-    function resetPitchTimer() {
-      if (pitchTimer) clearInterval(pitchTimer);
-      pitchTimer = null;
-      pitchSeconds = 180;
-      const btn = document.getElementById('pitch-timer-btn');
-      if (btn) btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i>';
-      updatePitchTimerDisplay();
-      safeLucide();
-    }
-
-    function updatePitchTimerDisplay() {
-      const m = Math.floor(pitchSeconds / 60);
-      const s = pitchSeconds % 60;
-      const disp = document.getElementById('pitch-timer-display');
-      if (disp) disp.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-
-    function loadPitchScript() {
-      const file = window.PROJECT_DATA && window.PROJECT_DATA.files ? window.PROJECT_DATA.files.find(f => f.path === "PITCH_SCRIPT.md") : null;
-      const el = document.getElementById('pitch-script-body');
-      if (el && file) {
-        el.innerHTML = safeMarkdown(file.content);
-      }
-    }
-
     // 10. Master App Bootstrapper
     function bootstrapApp() {
       safeInit("Counters", initCounters);
@@ -1732,7 +1618,6 @@
       safeInit("RubricTable", renderRubricTable);
       safeInit("Figures", renderFigures);
       safeInit("FileExplorer", initFileExplorer);
-      safeInit("PitchScript", loadPitchScript);
       safeInit("Lucide", safeLucide);
     }
 

@@ -30,7 +30,6 @@ Opens `http://localhost:8080` in your browser:
 - **⚡ Interactive QAOA Playground:** Toggle item combinations, observe the 4 binary slack qubits in real-time, and verify QUBO energy calculations.
 - **🔬 Hardware & Pareto Explorer:** Visualizes our 48-topology Pareto frontier and coupling graphs (Processor A vs B vs D).
 - **📁 File Inspector (51 Files):** Complete interactive repository browser with syntax highlighting for all scripts, datasets, and reports.
-- **🎤 3-Minute Pitch Teleprompter:** Live timer, slide visual cues, and presentation script.
 - **⚖️ Rubric Compliance Matrix:** 100% PASS verification checklist (G1–G4, C1–C5).
 
 To regenerate `report.pdf` from `report.md`:
