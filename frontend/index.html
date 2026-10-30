@@ -943,19 +943,82 @@ cx $2, $0;
 
   </div>
 
-  <!-- Image Modal Dialog -->
-  <dialog id="image-modal" class="bg-transparent backdrop:bg-black/80 backdrop:backdrop-blur-md p-4 rounded-2xl max-w-5xl w-full text-white outline-none">
-    <div class="spotlight-card rounded-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 id="modal-img-title" class="text-base font-bold text-brand-cyan">Figure Viewer</h3>
-        <button onclick="document.getElementById('image-modal').close()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+  <!-- Image Modal Dialog (High-Res Inspector) -->
+  <dialog id="image-modal" class="bg-transparent backdrop:bg-black/85 backdrop:backdrop-blur-md p-4 sm:p-6 rounded-3xl max-w-6xl w-full text-white outline-none">
+    <div class="spotlight-card rounded-2xl p-6 lg:p-8 space-y-6 max-h-[92vh] overflow-y-auto border border-white/15 bg-slate-950/95 shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="modal-category-badge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30">Category</span>
+            <span id="modal-filename-badge" class="text-[11px] font-mono text-slate-400 bg-black/40 px-2 py-0.5 rounded border border-white/10">filename.png</span>
+          </div>
+          <h3 id="modal-img-title" class="text-xl sm:text-2xl font-black text-white tracking-tight">Figure Viewer</h3>
+          <p id="modal-img-subtitle" class="text-xs sm:text-sm text-brand-cyan/90 font-medium"></p>
+        </div>
+        
+        <div class="flex items-center gap-2 shrink-0">
+          <a id="modal-img-link" href="" target="_blank" download class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition border border-white/10" title="Open full-size in new tab">
+            <i data-lucide="external-link" class="w-4 h-4 text-brand-cyan"></i>
+            <span class="hidden sm:inline">Open Full Size</span>
+          </a>
+          <button onclick="document.getElementById('image-modal').close()" class="p-2 rounded-xl bg-white/10 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 transition border border-white/10" title="Close dialog">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
       </div>
-      <div class="rounded-xl overflow-hidden bg-black/60 border border-white/10 p-2 flex justify-center">
-        <img id="modal-img-src" src="" alt="Enlarged Figure" class="max-h-[75vh] w-auto object-contain rounded-lg">
+
+      <!-- Quick Badges Container -->
+      <div id="modal-badges-container" class="flex flex-wrap gap-2"></div>
+
+      <!-- High-Res Image Display Container -->
+      <div class="rounded-2xl overflow-hidden bg-black/80 border border-white/10 p-3 sm:p-5 flex items-center justify-center shadow-inner group">
+        <img id="modal-img-src" src="" alt="Enlarged Figure" class="max-h-[60vh] w-auto max-w-full object-contain rounded-xl transition-transform duration-300">
       </div>
-      <p id="modal-img-desc" class="text-xs text-slate-400"></p>
+
+      <!-- Deep Dive Tabs / Accordions Inside Modal -->
+      <div class="space-y-4 pt-2">
+        
+        <!-- Key Takeaways -->
+        <div class="p-4 rounded-xl bg-brand-cyan/5 border border-brand-cyan/20 space-y-1.5">
+          <div class="text-xs font-bold text-brand-cyan uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Executive Takeaways & Key Metrics</span>
+          </div>
+          <div id="modal-takeaways-content" class="text-xs text-slate-200 leading-relaxed space-y-1"></div>
+        </div>
+
+        <!-- Two Column Deep Breakdown: What is this? & Why do we need it? -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
+            <div class="text-xs font-bold text-teal-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+              <span>What is this visual? (Breakdown)</span>
+            </div>
+            <div id="modal-what-content" class="text-xs text-slate-300 leading-relaxed space-y-1"></div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
+            <div class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>Why do we need it? (Rubric & Hardware Rationale)</span>
+            </div>
+            <div id="modal-why-content" class="text-xs text-slate-300 leading-relaxed space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- Evaluator FAQs Accordion -->
+        <div class="space-y-2 pt-2 border-t border-white/10">
+          <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="help-circle" class="w-4 h-4 text-brand-cyan"></i>
+            <span>Evaluator FAQs & Deep Explanations</span>
+          </div>
+          <div id="modal-faqs-container" class="space-y-2"></div>
+        </div>
+
+      </div>
+
     </div>
   </dialog>
 
